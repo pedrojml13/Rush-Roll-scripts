@@ -7,7 +7,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:295738989297:android:7954dace334780f957a750",
+        "mobilesdk_app_id": "",
         "android_client_info": {
           "package_name": "com.pjml.ball3d"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBbnpKgu6duGrKk9W05V8btkF10JR_y-18"
+          "current_key": ""
         }
       ],
       "services": {
