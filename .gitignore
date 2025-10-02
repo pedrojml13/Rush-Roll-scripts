@@ -1,0 +1,50 @@
+# Archivos y carpetas de Unity que deben ignorarse
+[Librerías temporales]
+Library/
+Temp/
+Obj/
+Build/
+Logs/
+UserSettings/
+MemoryCaptures/
+
+# Archivos de configuración
+*.csproj
+*.sln
+*.user
+*.unityproj
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de Unity que no deben subirse
+*.meta
+*.pidb
+*.booproj
+*.svd
+
+# Archivos de Firebase y configuración sensible
+google-services.json
+*.keystore
+*.jks
+
+# Archivos de configuración local
+.vscode/
+.idea/
+*.log
+
+# Archivos de sistema operativo
+*.swp
+*.bak
+*.tmp
+
+# Archivos de compilación
+*.apk
+*.aab
+*.exe
+*.dll
+*.so
+
+# Carpetas de paquetes
+Packages/
