@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Rush-Roll-scripts
 Scripts del videojuego Rush Roll, desarrollado en Unity. Incluye control físico de la bola, sistema de personalización visual, progresión por niveles y persistencia de datos con Firebase.
 =======
@@ -38,4 +38,4 @@ Puedes usar, modificar y distribuir el código libremente, siempre que se manten
 
 **Pedro Javier Morales Leyva**  
 Estudiante de DAM | Proyecto Final 2025
->>>>>>> fd2105eb961360fcb696864aa2df161cdc44a6e6
+
