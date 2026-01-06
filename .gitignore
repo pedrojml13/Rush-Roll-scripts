@@ -1,0 +1,30 @@
+# Unity meta files
+*.meta
+
+# Firebase / Google Services
+*.json
+
+# Logs and temp files
+*.log
+*.tmp
+*.bak
+*.swp
+
+# IDE / Editor files
+*.suo
+*.user
+*.userprefs
+*.csproj
+*.unityproj
+*.sln
+*.vcxproj
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+*.VC.db
+
+# OS generated files
+.DS_Store
+Thumbs.db
