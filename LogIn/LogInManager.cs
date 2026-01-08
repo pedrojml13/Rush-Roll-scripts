@@ -16,9 +16,10 @@ namespace PJML.RushAndRoll
     {
         [Header("Paneles de Interfaz")]
         [SerializeField] private GameObject loginPanel;
+        [SerializeField] private GameObject loginPanelGPGS;
         [SerializeField] private GameObject registerPanel;
         [SerializeField] private GameObject loadingPanel;
-        [SerializeField] private GameObject languagePanel;
+        [SerializeField] private GameObject loadingIcon;
 
         [Header("Inputs de Login")]
         [SerializeField] private TMP_InputField loginEmailInput;
@@ -60,10 +61,7 @@ namespace PJML.RushAndRoll
         /// </summary>
         private void InitializeUI()
         {
-            loadingPanel.SetActive(true);
-            loginPanel.SetActive(false);
-            registerPanel.SetActive(false);
-            languagePanel.SetActive(false);
+            ShowLoadingScreen();
         }
 
         /// <summary>
@@ -72,7 +70,7 @@ namespace PJML.RushAndRoll
         /// </summary>
         private void AttemptAutoLogin()
         {
-            #if UNITY_ANDROID
+            #if UNITY_ANDROID && !UNITY_EDITOR
                 // Intento de login con Google Play Games Services
                 AuthManager.Instance.LoginWithGPGS((success, error) =>
                 {
@@ -83,10 +81,12 @@ namespace PJML.RushAndRoll
                     }
                     else
                     {
-                        ShowLoadingScreen();
+                        HideLoadingScreen();
+                        ShowGPGSLoginPanel();
                     }
                 });
             #else
+            GameManager.Instance.LogOut();
                 FirebaseUser user = GameManager.Instance.GetCurrentUser();
 
                 if (user != null)
@@ -95,19 +95,9 @@ namespace PJML.RushAndRoll
                 }
                 else
                 {
-                    HandleFirstTimeLanguage();
+                    ShowLoginPanel();
                 }
             #endif
-        }
-
-        /// <summary>
-        /// Verifica si es la primera vez que el usuario entra para mostrar el selector de idioma.
-        /// </summary>
-        private void HandleFirstTimeLanguage()
-        {
-            bool hasLanguage = PlayerPrefs.HasKey("languageIndex");
-            languagePanel.SetActive(!hasLanguage);
-            ShowLoadingScreen();
         }
 
         /// <summary>
@@ -201,8 +191,60 @@ namespace PJML.RushAndRoll
         /// </summary>
         private void ShowLoadingScreen()
         {
-            loadingPanel.SetActive(false);
-            loginPanel.SetActive(true);
+            loadingPanel.SetActive(true);
+
+            RectTransform rt = loadingPanel.GetComponent<RectTransform>();
+            CanvasGroup cg = loadingPanel.GetComponent<CanvasGroup>();
+
+            if (cg != null)
+                cg.alpha = 0f; // Fade inicial
+
+            // Guardamos posición final
+            Vector2 finalPos = rt.anchoredPosition;
+
+            // Posición inicial fuera de pantalla (arriba)
+            rt.anchoredPosition = finalPos + new Vector2(0f, 800f);
+
+            // Movimiento hacia abajo
+            LeanTween.move(rt, finalPos, 0.6f)
+                    .setEaseOutCubic() // suave, desacelerando al final
+                    .setIgnoreTimeScale(true);
+
+            // Fade in
+            if (cg != null)
+            {
+                LeanTween.alphaCanvas(cg, 1f, 0.4f)
+                        .setIgnoreTimeScale(true);
+            }
+
+            LeanTween.scale(loadingIcon.gameObject, Vector3.one * 1.1f, 0.5f)
+         .setEaseInOutSine()
+         .setLoopPingPong()
+         .setIgnoreTimeScale(true);
+        }
+
+        /// <summary>
+        /// Oculta la pantalla de carga.
+        /// </summary>
+        private void HideLoadingScreen()
+        {
+            RectTransform rt = loadingPanel.GetComponent<RectTransform>();
+            CanvasGroup cg = loadingPanel.GetComponent<CanvasGroup>();
+
+            Vector2 targetPos = rt.anchoredPosition + new Vector2(0f, 800f); // sube hacia arriba
+
+            // Fade out
+            if (cg != null)
+            {
+                LeanTween.alphaCanvas(cg, 0f, 0.4f)
+                        .setIgnoreTimeScale(true);
+            }
+
+            // Movimiento hacia arriba
+            LeanTween.move(rt, targetPos, 0.6f)
+                    .setEaseInCubic() // sube suavemente, acelerando al inicio
+                    .setIgnoreTimeScale(true)
+                    .setOnComplete(() => loadingPanel.SetActive(false)); // desactiva al terminar
         }
 
         /// <summary>
@@ -210,8 +252,32 @@ namespace PJML.RushAndRoll
         /// </summary>
         public void ShowRegisterPanel()
         {
-            loginPanel.SetActive(false);
             registerPanel.SetActive(true);
+            loginPanel.SetActive(false);
+
+            RectTransform rt = registerPanel.GetComponent<RectTransform>();
+            CanvasGroup cg = registerPanel.GetComponent<CanvasGroup>();
+
+            if (cg != null)
+                cg.alpha = 0f;
+
+            // Posición final (la del layout)
+            Vector2 finalPos = rt.anchoredPosition;
+
+            // Posición inicial (fuera por abajo)
+            rt.anchoredPosition = finalPos - new Vector2(0f, 800f);
+
+            // Movimiento hacia arriba
+            LeanTween.move(rt, finalPos, 0.6f)
+                    .setEaseOutCubic()
+                    .setIgnoreTimeScale(true);
+
+            // Fade in
+            if (cg != null)
+            {
+                LeanTween.alphaCanvas(cg, 1f, 0.4f)
+                        .setIgnoreTimeScale(true);
+            }
         }
 
         /// <summary>
@@ -219,10 +285,100 @@ namespace PJML.RushAndRoll
         /// </summary>
         public void ShowLoginPanel()
         {
-            registerPanel.SetActive(false);
             loginPanel.SetActive(true);
+            HideLoadingScreen();
+            registerPanel.SetActive(false);
+
+            RectTransform rt = loginPanel.GetComponent<RectTransform>();
+            CanvasGroup cg = loginPanel.GetComponent<CanvasGroup>();
+
+            if (cg != null)
+                cg.alpha = 0f;
+
+            // Posición final (la del layout)
+            Vector2 finalPos = rt.anchoredPosition;
+
+            // Posición inicial (fuera por abajo)
+            rt.anchoredPosition = finalPos - new Vector2(0f, 800f);
+
+            // Movimiento hacia arriba
+            LeanTween.move(rt, finalPos, 0.6f)
+                    .setEaseOutCubic()
+                    .setIgnoreTimeScale(true);
+
+            // Fade in
+            if (cg != null)
+            {
+                LeanTween.alphaCanvas(cg, 1f, 0.4f)
+                        .setIgnoreTimeScale(true);
+            }
         }
 
+        /// <summary>
+        /// Muestra el panel de login con GPGS.
+        /// </summary>
+        public void ShowGPGSLoginPanel()
+        {
+            loginPanelGPGS.SetActive(true);
+
+            RectTransform rt = loginPanelGPGS.GetComponent<RectTransform>();
+            CanvasGroup cg = loginPanelGPGS.GetComponent<CanvasGroup>();
+
+            if (cg != null)
+                cg.alpha = 0f;
+
+            // Posición final (la del layout)
+            Vector2 finalPos = rt.anchoredPosition;
+
+            // Posición inicial (fuera por abajo)
+            rt.anchoredPosition = finalPos - new Vector2(0f, 800f);
+
+            // Movimiento hacia arriba
+            LeanTween.move(rt, finalPos, 0.6f)
+                    .setEaseOutCubic()
+                    .setIgnoreTimeScale(true);
+
+            // Fade in
+            if (cg != null)
+            {
+                LeanTween.alphaCanvas(cg, 1f, 0.4f)
+                        .setIgnoreTimeScale(true);
+            }
+        }
+
+        /// <summary>
+        /// Ejecuta el proceso de inicio de sesión con GPGS.
+        /// </summary>
+        public void OnGPGSLoginButton()
+        {
+            string email = loginEmailInput.text;
+            string password = loginPasswordInput.text;
+
+            loadingPanel.SetActive(true);
+            loginPanel.SetActive(false);
+
+                // Intento de login con Google Play Games Services
+                AuthManager.Instance.LoginWithGPGS((success, error) =>
+                {
+                    if (success)
+                    {
+
+                        NavigateToMenu();
+                    }
+                    else
+                    {
+                        ShowGPGSLoginPanel();
+                    }
+                });
+        }
+
+        /// <summary>
+        /// Reproduce el sonido del botón, vibra y cierra la aplicación.
+        /// </summary>
+        public void OnExitButton()
+        {
+            Application.Quit();
+        }
 
     }
 }
