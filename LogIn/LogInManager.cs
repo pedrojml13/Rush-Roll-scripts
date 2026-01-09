@@ -86,7 +86,6 @@ namespace PJML.RushAndRoll
                     }
                 });
             #else
-            GameManager.Instance.LogOut();
                 FirebaseUser user = GameManager.Instance.GetCurrentUser();
 
                 if (user != null)
@@ -96,6 +95,7 @@ namespace PJML.RushAndRoll
                 else
                 {
                     ShowLoginPanel();
+                    HideLoadingScreen();
                 }
             #endif
         }
@@ -351,11 +351,11 @@ namespace PJML.RushAndRoll
         /// </summary>
         public void OnGPGSLoginButton()
         {
-            string email = loginEmailInput.text;
-            string password = loginPasswordInput.text;
 
             loadingPanel.SetActive(true);
             loginPanel.SetActive(false);
+
+            GameManager.Instance.LogOut();
 
                 // Intento de login con Google Play Games Services
                 AuthManager.Instance.LoginWithGPGS((success, error) =>

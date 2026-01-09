@@ -1,55 +1,41 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 namespace PJML.RushAndRoll
 {
     /// <summary>
-    /// Gestiona la lógica del selector de niveles, incluyendo la instanciación de botones,
-    /// el cambio de escenarios visuales y la actualización de la música de fondo.
+    /// Gestor del selector de niveles: activa mundos, instancia botones y reproduce música.
     /// </summary>
     public class LevelSelectorManager : MonoBehaviour
     {
-        /// <summary>
-        /// Instancia única del LevelManager.
-        /// </summary>
         public static LevelSelectorManager Instance { get; private set; }
 
-        [Header("Escenarios")]
-        [Tooltip("Objetos raíz que contienen el arte de cada mundo.")]
-        [SerializeField] private GameObject sceneryBeach;
-        [SerializeField] private GameObject sceneryForest;
-        [SerializeField] private GameObject sceneryDesert;
-        [SerializeField] private GameObject sceneryUnderwater;
-        [SerializeField] private GameObject sceneryIce;
+        [Header("Paneles de mundo")]
+        [SerializeField] private Transform[] worldPanels; 
+        [SerializeField] private GameObject howToPlayPanel;
 
-        [Header("Botones de nivel")]
-        [Tooltip("Prefabs de botones personalizados para cada bioma.")]
-        [SerializeField] private GameObject beachLevelButtonPrefab;
-        [SerializeField] private GameObject forestLevelButtonPrefab;
-        [SerializeField] private GameObject desertLevelButtonPrefab;
-        [SerializeField] private GameObject underwaterLevelButtonPrefab;
-        [SerializeField] private GameObject iceLevelButtonPrefab;
+        [Header("Botones y colores de los botones")]
+        [SerializeField] private Image backButtonImage;
+        [SerializeField] private Image nextButtonImage;
+        [SerializeField] private Image menuButtonImage;
+        [SerializeField] private Image howToPlayButtonImage;
+        [SerializeField] private Image howToPlayPanelImage;
 
-        [Header("Paneles de Contenedor")]
-        [Tooltip("Transform donde se agruparán los botones de cada mundo.")]
-        [SerializeField] private Transform beachPanel;
-        [SerializeField] private Transform forestPanel;
-        [SerializeField] private Transform desertPanel;
-        [SerializeField] private Transform underWaterPanel;
-        [SerializeField] private Transform icePanel;
+        [SerializeField] private Color [] buttonsColors;
+        [Header("Prefabs de botones por mundo")]
+        [SerializeField] private GameObject[] levelButtonPrefabs; 
 
-        [Header("Música por escenario")]
-        [SerializeField] private AudioClip beachMusic;
-        [SerializeField] private AudioClip forestMusic;
-        [SerializeField] private AudioClip desertMusic;
-        [SerializeField] private AudioClip underwaterMusic;
-        [SerializeField] private AudioClip iceMusic;
+        [Header("Música por mundo")]
+        [SerializeField] private AudioClip[] musicClips; 
 
         [Header("Sonidos")]
         [SerializeField] private AudioClip buttonClickSound;
 
-        private int sceneryNumber = 0;
+        private int currentWorld = 0;
+        private Vector2 howToPlayBasePos;
+
 
         /// <summary>
         /// Singleton, asegura que solo exista una instancia.
@@ -61,112 +47,127 @@ namespace PJML.RushAndRoll
                 Destroy(gameObject);
                 return;
             }
-
             Instance = this;
         }
 
         /// <summary>
-        /// Activa el escenario de la playa, genera los botones de los niveles y actualiza la música.
+        /// Muestra el primer mundo e inicializa los botones.
         /// </summary>
         void Start()
         {
-            sceneryBeach.SetActive(true);
-            sceneryForest.SetActive(false);
-            sceneryDesert.SetActive(false);
-            sceneryUnderwater.SetActive(false);
-            sceneryIce.SetActive(false);
+            howToPlayBasePos = howToPlayPanel.GetComponent<RectTransform>().anchoredPosition;
 
+            ShowWorld(0);
             GenerateLevelButtons();
-            UpdateMusic();
         }
 
         /// <summary>
-        /// Recupera los datos de niveles del GameManager e instancia los botones
-        /// en sus respectivos paneles según el índice del nivel.
+        /// Instancia los botones de los niveles dentro de sus respectivos paneles.
         /// </summary>
         private void GenerateLevelButtons()
         {
             List<LevelData> levels = GameManager.Instance.GetLevels();
 
-            sceneryBeach.SetActive(true);
-            sceneryForest.SetActive(true);
-            sceneryDesert.SetActive(true);
-            sceneryUnderwater.SetActive(true);
-            sceneryIce.SetActive(true);
-
             for (int i = 0; i < levels.Count; i++)
             {
-                Transform parentPanel = GetPanelForLevel(i);
-                GameObject btnObj;
-
-                // Selección de Prefab por rango de niveles (9 niveles por mundo)
-                if (i < 9)
-                    btnObj = Instantiate(beachLevelButtonPrefab, parentPanel);
-                else if (i < 18)
-                    btnObj = Instantiate(forestLevelButtonPrefab, parentPanel);
-                else if (i < 27)
-                    btnObj = Instantiate(desertLevelButtonPrefab, parentPanel);
-                else if (i < 36)
-                    btnObj = Instantiate(underwaterLevelButtonPrefab, parentPanel);
-                else
-                    btnObj = Instantiate(iceLevelButtonPrefab, parentPanel);
-
-                LevelButton btn = btnObj.GetComponent<LevelButton>();
-                LevelData level = levels[i];
+                int worldIndex = Mathf.Clamp(i / 9, 0, worldPanels.Length - 1);
+                GameObject btnObj = Instantiate(levelButtonPrefabs[worldIndex], worldPanels[worldIndex]);
                 
-                // Configura el estado visual y datos del botón
+                LevelData level = levels[i];
+                LevelButton btn = btnObj.GetComponent<LevelButton>();
                 btn.Setup(level.levelIndex, level.unlocked, level.stars, level.bestTime);
             }
-
-            sceneryBeach.SetActive(true);
-            sceneryForest.SetActive(false);
-            sceneryDesert.SetActive(false);
-            sceneryUnderwater.SetActive(false);
-            sceneryIce.SetActive(false);
         }
 
         /// <summary>
-        /// Devuelve el panel dependiendo del índice.
+        /// Muestra el panel del mundo seleccionado, desactivando los demás.
         /// </summary>
-        /// <param name="levelIndex">Indice del nivel.</param>
-        /// <returns>El panel correspondiente.</returns>
-        private Transform GetPanelForLevel(int levelIndex)
+        /// <param name="worldIndex">Indice del mundo</param>
+        public void ShowWorld(int worldIndex)
         {
-            if (levelIndex < 9) return beachPanel;
-            if (levelIndex < 18) return forestPanel;
-            if (levelIndex < 27) return desertPanel;
-            if (levelIndex < 36) return underWaterPanel;
-            return icePanel;
+            currentWorld = Mathf.Clamp(worldIndex, 0, worldPanels.Length - 1);
+
+            for (int i = 0; i < worldPanels.Length; i++)
+                worldPanels[i].gameObject.SetActive(i == currentWorld);
+
+            backButtonImage.color = buttonsColors[(worldIndex - 1 + buttonsColors.Length) % buttonsColors.Length];
+            nextButtonImage.color = buttonsColors[(worldIndex+1) % buttonsColors.Length];
+            menuButtonImage.color = buttonsColors[worldIndex];
+            howToPlayButtonImage.color = buttonsColors[worldIndex];
+            howToPlayPanelImage.color = buttonsColors[worldIndex];
+
+            AnimatePanel(worldPanels[currentWorld]);
+            AudioManager.Instance.PlayMusic(musicClips[currentWorld]);
         }
 
         /// <summary>
-        /// Actualiza la música según el panel actual.
+        /// Anima un panel usando LeanTween.
         /// </summary>
-        private void UpdateMusic()
+        /// <param name="panel">Panel a animar</param>
+        private void AnimatePanel(Transform panel)
         {
-            switch (sceneryNumber)
-            {
-                case 0: AudioManager.Instance.PlayMusic(beachMusic); break;
-                case 1: AudioManager.Instance.PlayMusic(forestMusic); break;
-                case 2: AudioManager.Instance.PlayMusic(desertMusic); break;
-                case 3: AudioManager.Instance.PlayMusic(underwaterMusic); break;
-                case 4: AudioManager.Instance.PlayMusic(iceMusic); break;
-            }
+            CanvasGroup cg = panel.GetComponent<CanvasGroup>();
+            if (cg == null) cg = panel.gameObject.AddComponent<CanvasGroup>();
+
+            panel.localScale = Vector3.zero;
+            cg.alpha = 0f;
+            panel.gameObject.SetActive(true);
+
+            LeanTween.scale(panel.gameObject, Vector3.one, 0.5f).setEaseOutBack();
+            LeanTween.alphaCanvas(cg, 1f, 0.5f);
         }
 
         /// <summary>
-        /// Carga la escena de juego correspondiente al nivel.
+        /// Carga la escena correspondiente al nivel.
         /// </summary>
-        /// <param name="levelIndex">Índice del nivel.</param>
         public void LoadLevel(int levelIndex)
         {
             Time.timeScale = 1f;
-            // Escena 0 = Login, Escena 1 = Menú Principal
             SceneManager.LoadScene(levelIndex + 2);
         }
 
         /// <summary>
-        /// Reproduce el sonido del botón y regresa al menú principal.
+        /// Muestra el panel de como jugar
+        /// </summary>
+        public void OnHowToPlayButton()
+        {
+            AudioManager.Instance.PlaySFX(buttonClickSound);
+            howToPlayPanel.SetActive(true);
+
+            RectTransform rt = howToPlayPanel.GetComponent<RectTransform>();
+            CanvasGroup cg = howToPlayPanel.GetComponent<CanvasGroup>();
+
+            if (cg != null)
+                cg.alpha = 0f;
+
+            rt.anchoredPosition = howToPlayBasePos + Vector2.down * 800f;
+
+            LeanTween.move(rt, howToPlayBasePos, 0.6f)
+                .setEaseOutCubic()
+                .setIgnoreTimeScale(true);
+        }
+
+        /// <summary>
+        /// Oculta el panel de como jugar
+        /// </summary>
+        public void OnCloseHowToPlayButton()
+        {
+            AudioManager.Instance.PlaySFX(buttonClickSound);
+
+            RectTransform rt = howToPlayPanel.GetComponent<RectTransform>();
+
+            LeanTween.move(rt, howToPlayBasePos + Vector2.down * 800f, 0.6f)
+                .setEaseInCubic()
+                .setIgnoreTimeScale(true)
+                .setOnComplete(() =>
+                {
+                    howToPlayPanel.SetActive(false);
+                    rt.anchoredPosition = howToPlayBasePos;
+                });
+        }
+
+        /// <summary>
+        /// Regresa al menú principal.
         /// </summary>
         public void OnMenuButton()
         {
@@ -175,61 +176,21 @@ namespace PJML.RushAndRoll
         }
 
         /// <summary>
-        /// Anima el panel mediante LeanTween.
+        /// Cambia al siguiente mundo (botón flecha derecha, por ejemplo)
         /// </summary>
-        /// <param name="panel">Panel a animar.</param>
-        private void AnimateScenery(Transform panel)
+        public void NextWorld()
         {
-            CanvasGroup canvasGroup = panel.GetComponent<CanvasGroup>();
-            if (canvasGroup == null)
-                canvasGroup = panel.gameObject.AddComponent<CanvasGroup>();
-
-            panel.localScale = Vector3.zero;
-            canvasGroup.alpha = 0f;
-            panel.gameObject.SetActive(true);
-
-            LeanTween.scale(panel.gameObject, Vector3.one, 0.5f).setEaseOutBack();
-            LeanTween.alphaCanvas(canvasGroup, 1f, 0.5f);
+            int next = (currentWorld + 1) % worldPanels.Length;
+            ShowWorld(next);
         }
 
         /// <summary>
-        /// Cambia el panel dependiendo del índice.
+        /// Cambia al mundo anterior (botón flecha izquierda)
         /// </summary>
-        /// <param name="sceneryIndex">Indice del escenario.</param>
-        public void ChangeScenery(int sceneryIndex)
+        public void PreviousWorld()
         {
-            AudioManager.Instance.PlaySFX(buttonClickSound);
-
-            sceneryBeach.SetActive(false);
-            sceneryForest.SetActive(false);
-            sceneryDesert.SetActive(false);
-            sceneryUnderwater.SetActive(false);
-            sceneryIce.SetActive(false);
-
-            beachPanel.gameObject.SetActive(false);
-            forestPanel.gameObject.SetActive(false);
-            desertPanel.gameObject.SetActive(false);
-            underWaterPanel.gameObject.SetActive(false);
-            icePanel.gameObject.SetActive(false);
-
-            GameObject targetScenery = sceneryBeach;
-            Transform targetPanel = beachPanel;
-
-            switch (sceneryIndex)
-            {
-                case 0: targetScenery = sceneryBeach; targetPanel = beachPanel; break;
-                case 1: targetScenery = sceneryForest; targetPanel = forestPanel; break;
-                case 2: targetScenery = sceneryDesert; targetPanel = desertPanel; break;
-                case 3: targetScenery = sceneryUnderwater; targetPanel = underWaterPanel; break;
-                case 4: targetScenery = sceneryIce; targetPanel = icePanel; break;
-                default: targetScenery = sceneryBeach; targetPanel = beachPanel; break;
-            }
-
-            targetScenery.SetActive(true);
-            AnimateScenery(targetPanel);
-
-            sceneryNumber = sceneryIndex;
-            UpdateMusic();
+            int prev = (currentWorld - 1 + worldPanels.Length) % worldPanels.Length;
+            ShowWorld(prev);
         }
     }
 }

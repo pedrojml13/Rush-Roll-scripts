@@ -213,10 +213,11 @@ namespace PJML.RushAndRoll
         }
 
         /// <summary>
-        /// Marca online y va a la escena de login
+        /// Notifica al GameManager y va a la escena de login
         /// </summary>
         public void OnTryToLogInButton()
         {
+            GameManager.Instance.LogOut();
             SceneManager.LoadScene("Login");
         }
 
@@ -303,6 +304,8 @@ namespace PJML.RushAndRoll
         {
             thanksPanel.SetActive(true);
 
+            LevelPlayManager.Instance.HideBanner();
+
             thanksPanel.transform.localScale = Vector3.zero;
 
             CanvasGroup cg = thanksPanel.GetComponent<CanvasGroup>();
@@ -348,6 +351,8 @@ namespace PJML.RushAndRoll
                 LeanTween.alphaCanvas(cg, 0f, 0.3f)
                         .setIgnoreTimeScale(true);
             }
+
+            LevelPlayManager.Instance.ShowBanner();
         }
 
         /// <summary>
@@ -392,6 +397,8 @@ namespace PJML.RushAndRoll
                 LeanTween.alphaCanvas(cg, 1f, 0.4f)
                         .setIgnoreTimeScale(true);
             }
+
+            LevelPlayManager.Instance.HideBanner();
         }
 
         /// <summary>
@@ -415,6 +422,8 @@ namespace PJML.RushAndRoll
                 LeanTween.alphaCanvas(cg, 0f, 0.3f)
                         .setIgnoreTimeScale(true);
             }
+
+            LevelPlayManager.Instance.ShowBanner();
         }
 
 
