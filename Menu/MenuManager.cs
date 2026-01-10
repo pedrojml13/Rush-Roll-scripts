@@ -3,6 +3,8 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections;
 using UnityEngine.UI;
+using Google.Play.Review;
+
 
 
 namespace PJML.RushAndRoll
@@ -32,7 +34,7 @@ namespace PJML.RushAndRoll
         [SerializeField] GameObject rMShopButton;
         [SerializeField] GameObject leaderBoardsButton;
         [SerializeField] GameObject achievementsButton;
-        [SerializeField] GameObject supporterButton, supporterPanel, thanksPanel, supporterImage, gameEndedImage, supporterImage1, gameEndedImage1, extendedPlayerPanel;
+        [SerializeField] GameObject supporterButton, supporterPanel, thanksPanel, supporterImage, gameEndedImage, supporterImage1, gameEndedImage1, extendedPlayerPanel, giveFeedbackButton;
 
         [Header("Elementos de Escena")]
         [SerializeField] private GameObject menuSfere;
@@ -122,6 +124,7 @@ namespace PJML.RushAndRoll
                 leaderBoardsButton.SetActive(false);
                 achievementsButton.SetActive(false);
                 supporterButton.SetActive(false);
+                giveFeedbackButton.SetActive(false);
                 tryLogInButton.SetActive(true);
 
                 string username = GameManager.Instance.GetUsername();
@@ -461,6 +464,33 @@ namespace PJML.RushAndRoll
             AudioManager.Instance.PlaySFX(buttonClickSound);
             VibrationManager.Instance.Vibrate();
             Application.Quit();
+        }
+
+        /// <summary>
+        /// Reproduce el sonido del botón, vibra y muestra una ventana emergente para dejar una valoración a través de
+        /// la API de Google Play Review.
+        /// </summary>
+        public void OnGiveFeedbackButton()
+        {
+            AudioManager.Instance.PlaySFX(buttonClickSound);
+            VibrationManager.Instance.Vibrate();
+
+            var reviewManager = new ReviewManager();
+            var requestFlow = reviewManager.RequestReviewFlow();
+
+            requestFlow.Completed += (operation) =>
+            {
+                // Si existe un error, la API no muestra el diálogo
+                if (operation.Error == ReviewErrorCode.NoError)
+                {
+                    var playReviewInfo = operation.GetResult();
+                    var launchFlow = reviewManager.LaunchReviewFlow(playReviewInfo);
+                    launchFlow.Completed += (launchOp) =>
+                    {
+                        // El diálogo terminó
+                    };
+                }
+            };
         }
 
         /// <summary>

@@ -37,7 +37,6 @@ namespace PJML.RushAndRoll
         [SerializeField] private GameObject err;
         [SerializeField] private GameObject usernameTakenMsg;
 
-        private bool offline = false;
 
         /// <summary>
         /// Inicializa la UI, si tiene internet intenta logearse automáticamente y si no se logea offline.
@@ -49,7 +48,7 @@ namespace PJML.RushAndRoll
 
             //GameManager.Instance.LogOut();
             InitializeUI();
-            // Si hay internet nos logeamos, si no vamos al menu
+            // Si hay internet nos logeamos, si no vamos al menu.
             if(GameManager.Instance.HasInternetConection())
                 AttemptAutoLogin();
             else

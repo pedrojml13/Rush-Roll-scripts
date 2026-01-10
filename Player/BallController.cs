@@ -27,9 +27,6 @@ namespace PJML.RushAndRoll
         private Vector3 neutralTilt = Vector3.zero;
         private bool isGrounded = false;
         [SerializeField] private float jumpForce = 5f;
-        private float lastTapTime = 0f;
-        private float doubleTapThreshold = 0.3f;
-        private int tapCount = 0;
         private float touchStartTime = 0f;
 
         /// <summary>
