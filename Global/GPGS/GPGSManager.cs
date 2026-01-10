@@ -103,5 +103,6 @@ namespace PJML.RushAndRoll
                 callback(authCode);
             });
         }
+
     }
 }

@@ -41,7 +41,7 @@ namespace PJML.RushAndRoll
         /// <param name="levelCoins">Cantidad de monedas recolectadas.</param>
         public void OnLevelCompletedAchievements(int levelIndex, int stars, bool firstTime, int levelCoins)
         {
-            if (GameManager.Instance.HasInternet())
+            if (!GameManager.Instance.IsOffline())
             {
                 // --- Logros de Avance ---
                 if (firstTime && levelIndex == 0)
@@ -103,7 +103,7 @@ namespace PJML.RushAndRoll
         /// </summary>
         public void onLevelFailedAchievements()
         {
-            if (GameManager.Instance.HasInternet())
+            if (!GameManager.Instance.IsOffline())
             {
                 IncrementAchievement(GPGSIds.achievement_hardheaded, 100);
             }
@@ -115,7 +115,7 @@ namespace PJML.RushAndRoll
         /// <param name="type">Tipo de enemigo derrotado.</param>
         public void OnEnemyKilledAchievements(EnemyType type)
         {
-            if (GameManager.Instance.HasInternet())
+            if (!GameManager.Instance.IsOffline())
             {
                 switch (type)
                 {
@@ -145,7 +145,7 @@ namespace PJML.RushAndRoll
         /// </summary>
         public void OnSkinPurchasedAchievements()
         {
-            if (GameManager.Instance.HasInternet())
+            if (!GameManager.Instance.IsOffline())
             {
                 int purchased = GameManager.Instance.GetTotalPurchasedSkins();
                 
@@ -165,7 +165,7 @@ namespace PJML.RushAndRoll
         /// <param name="key">ID del logro.</param>
         public void ReportProgress(string key)
         {
-            if (GameManager.Instance.HasInternet())
+            if (!GameManager.Instance.IsOffline())
             {
                 if (!GPGSManager.Instance.IsAuthenticated) {
                     Debug.LogWarning("User is not authenticated. Cannot unlock achievement.");
@@ -186,7 +186,7 @@ namespace PJML.RushAndRoll
         /// <param name="steps">Cantidad de pasos a sumar al progreso actual.</param>
         public void IncrementAchievement(string key, int steps)
         {
-            if (GameManager.Instance.HasInternet())
+            if (!GameManager.Instance.IsOffline())
             {
                 if (!GPGSManager.Instance.IsAuthenticated)
                 {
@@ -206,7 +206,7 @@ namespace PJML.RushAndRoll
         /// </summary>
         public void ShowAchievementsUI()
         {
-            if (GameManager.Instance.HasInternet())
+            if (!GameManager.Instance.IsOffline())
             {
                 if (GPGSManager.Instance.IsAuthenticated)
                 {

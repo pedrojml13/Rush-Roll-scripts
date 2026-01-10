@@ -57,9 +57,9 @@ namespace PJML.RushAndRoll
         /// Espera hasta que la sesión del jugador esté inicializada y carga la skin seleccionada y las skins desbloqueadas.
         /// </summary>
         /// <param name="onComplete">Indica si se ha completado con éxito.</param>
-        public void WaitForSessionReady(Action onComplete)
+        public void WaitForSessionReady(bool offline, Action onComplete)
         {
-            SessionManager.Instance.InitializeSession(() =>
+            SessionManager.Instance.InitializeSession(offline, () =>
             {
                 selectedBallSkin = skins[SessionManager.Instance.GetSelectedSkinId()];
 
@@ -167,9 +167,18 @@ namespace PJML.RushAndRoll
         /// Comprueba si tiene conexión a internet
         /// </summary>
         /// <returns>Si hay conexión a internet.</returns>
-        public bool HasInternet()
+        public bool HasInternetConection()
         {
-            return SessionManager.Instance.HasInternet();
+            return SessionManager.Instance.HasInternetConection();
+        }
+
+        /// <summary>
+        /// Comprueba si la sesión es offline
+        /// </summary>
+        /// <returns>Si hay conexión a internet.</returns>
+        public bool IsOffline()
+        {
+            return SessionManager.Instance.IsOffline();
         }
 
         /// <summary>

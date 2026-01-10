@@ -20,6 +20,7 @@ namespace PJML.RushAndRoll
         [SerializeField] private GameObject registerPanel;
         [SerializeField] private GameObject loadingPanel;
         [SerializeField] private GameObject loadingIcon;
+        [SerializeField] private GameObject noAccountPanel;
 
         [Header("Inputs de Login")]
         [SerializeField] private TMP_InputField loginEmailInput;
@@ -36,6 +37,8 @@ namespace PJML.RushAndRoll
         [SerializeField] private GameObject err;
         [SerializeField] private GameObject usernameTakenMsg;
 
+        private bool offline = false;
+
         /// <summary>
         /// Inicializa la UI, si tiene internet intenta logearse automáticamente y si no se logea offline.
         /// </summary>
@@ -47,11 +50,11 @@ namespace PJML.RushAndRoll
             //GameManager.Instance.LogOut();
             InitializeUI();
             // Si hay internet nos logeamos, si no vamos al menu
-            if(GameManager.Instance.HasInternet())
+            if(GameManager.Instance.HasInternetConection())
                 AttemptAutoLogin();
             else
             {
-                NavigateToMenu();
+                NavigateToMenu(true);
             }
                 
         }
@@ -76,8 +79,7 @@ namespace PJML.RushAndRoll
                 {
                     if (success)
                     {
-
-                        NavigateToMenu();
+                        NavigateToMenu(false);
                     }
                     else
                     {
@@ -90,7 +92,7 @@ namespace PJML.RushAndRoll
 
                 if (user != null)
                 {
-                    NavigateToMenu();
+                    NavigateToMenu(false);
                 }
                 else
                 {
@@ -115,7 +117,7 @@ namespace PJML.RushAndRoll
             {
                 if (success)
                 {
-                    NavigateToMenu();
+                    NavigateToMenu(false);
                 }
                 else
                 {
@@ -173,14 +175,14 @@ namespace PJML.RushAndRoll
         /// </summary>
         public void OnOfflineButton()
         {
-            NavigateToMenu();
+            NavigateToMenu(true);
         }
 
         
-        private void NavigateToMenu()
+        private void NavigateToMenu(bool isOffline)
         {
             loadingPanel.SetActive(true);
-            GameManager.Instance.WaitForSessionReady(() =>
+            GameManager.Instance.WaitForSessionReady(isOffline, () =>
             {
                 SceneManager.LoadScene("Menu");
             });
@@ -315,6 +317,59 @@ namespace PJML.RushAndRoll
         }
 
         /// <summary>
+        /// Muestra el panel de que no hay cuenta asociada.
+        /// </summary>
+        public void ShowNoAccountPanelPanel()
+        {
+            noAccountPanel.SetActive(true);
+
+            RectTransform rt = noAccountPanel.GetComponent<RectTransform>();
+            CanvasGroup cg = noAccountPanel.GetComponent<CanvasGroup>();
+
+            if (cg != null)
+                cg.alpha = 0f;
+
+            Vector2 finalPos = rt.anchoredPosition;
+
+            rt.anchoredPosition = finalPos + new Vector2(0f, 800f);
+
+            LeanTween.move(rt, finalPos, 0.6f)
+                .setEaseOutCubic()
+                .setIgnoreTimeScale(true);
+
+            if (cg != null)
+            {
+                LeanTween.alphaCanvas(cg, 1f, 0.4f)
+                    .setIgnoreTimeScale(true);
+            }
+        }
+
+        /// <summary>
+        /// Oculta el panel de que no hay cuenta asociada.
+        /// </summary>
+        public void HideNoAccountPanelPanel()
+        {
+            RectTransform rt = noAccountPanel.GetComponent<RectTransform>();
+            CanvasGroup cg = noAccountPanel.GetComponent<CanvasGroup>();
+            Vector2 finalPos = rt.anchoredPosition;
+
+            if (cg != null)
+            {
+                LeanTween.alphaCanvas(cg, 0f, 0.4f)
+                    .setIgnoreTimeScale(true);
+            }
+
+            LeanTween.move(rt, finalPos + new Vector2(0f, 800f), 0.6f)
+                .setEaseInCubic()
+                .setIgnoreTimeScale(true)
+                .setOnComplete(() =>
+                {
+                    noAccountPanel.SetActive(false);
+                    rt.anchoredPosition = finalPos;
+                });
+        }
+
+        /// <summary>
         /// Muestra el panel de login con GPGS.
         /// </summary>
         public void ShowGPGSLoginPanel()
@@ -355,21 +410,19 @@ namespace PJML.RushAndRoll
             loadingPanel.SetActive(true);
             loginPanel.SetActive(false);
 
-            GameManager.Instance.LogOut();
-
-                // Intento de login con Google Play Games Services
-                AuthManager.Instance.LoginWithGPGS((success, error) =>
+            // Intento de login con Google Play Games Services
+            AuthManager.Instance.LoginWithGPGS((success, error) =>
+            {
+                if (success)
                 {
-                    if (success)
-                    {
 
-                        NavigateToMenu();
-                    }
-                    else
-                    {
-                        ShowGPGSLoginPanel();
-                    }
-                });
+                    NavigateToMenu(false);
+                }
+                else
+                {
+                    ShowNoAccountPanelPanel();
+                }
+            });
         }
 
         /// <summary>

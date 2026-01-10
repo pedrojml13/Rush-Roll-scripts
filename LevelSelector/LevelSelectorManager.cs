@@ -132,6 +132,7 @@ namespace PJML.RushAndRoll
         public void OnHowToPlayButton()
         {
             AudioManager.Instance.PlaySFX(buttonClickSound);
+            VibrationManager.Instance.Vibrate();
             howToPlayPanel.SetActive(true);
 
             RectTransform rt = howToPlayPanel.GetComponent<RectTransform>();
@@ -153,6 +154,7 @@ namespace PJML.RushAndRoll
         public void OnCloseHowToPlayButton()
         {
             AudioManager.Instance.PlaySFX(buttonClickSound);
+            VibrationManager.Instance.Vibrate();
 
             RectTransform rt = howToPlayPanel.GetComponent<RectTransform>();
 
@@ -172,23 +174,27 @@ namespace PJML.RushAndRoll
         public void OnMenuButton()
         {
             AudioManager.Instance.PlaySFX(buttonClickSound);
+            VibrationManager.Instance.Vibrate();
             SceneManager.LoadScene("Menu");
         }
 
         /// <summary>
-        /// Cambia al siguiente mundo (botón flecha derecha, por ejemplo)
+        /// Cambia al siguiente mundo
         /// </summary>
         public void NextWorld()
         {
+            AudioManager.Instance.PlaySFX(buttonClickSound);
             int next = (currentWorld + 1) % worldPanels.Length;
             ShowWorld(next);
         }
 
         /// <summary>
-        /// Cambia al mundo anterior (botón flecha izquierda)
+        /// Cambia al mundo anterior
         /// </summary>
         public void PreviousWorld()
         {
+            AudioManager.Instance.PlaySFX(buttonClickSound);
+
             int prev = (currentWorld - 1 + worldPanels.Length) % worldPanels.Length;
             ShowWorld(prev);
         }

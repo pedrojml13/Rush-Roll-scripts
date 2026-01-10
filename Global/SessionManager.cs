@@ -33,7 +33,8 @@ namespace PJML.RushAndRoll
         private int selectedSkinId;
         private bool isSupporter;
         private bool gameEnded;
-        private bool hasInternet;
+        private bool hasInternetConection;
+        private bool offline;
         private float totalPlayedTime;
 
         /// <summary>
@@ -51,20 +52,22 @@ namespace PJML.RushAndRoll
             {
                 Destroy(gameObject);
             }
-            hasInternet = (Application.internetReachability != NetworkReachability.NotReachable);
+            hasInternetConection = (Application.internetReachability != NetworkReachability.NotReachable);
         }
 
         /// <summary>
         /// Carga todos los datos del jugador y rankings globales. Si no hay conexión carga datos locales.
         /// </summary>
         /// <param name="onComplete">Indica cuando está lista la sesión.</param>
-        public void InitializeSession(Action onComplete)
+        public void InitializeSession(bool offline, Action onComplete)
         {
 
             //Caching.ClearCache();
 
+            this.offline = offline;
+
             // Si no tiene internet, carga los datos locales.
-            if (!hasInternet)
+            if (offline)
             {
                 LoadLocalData();
                 IsReady = true;
@@ -115,9 +118,17 @@ namespace PJML.RushAndRoll
         /// <summary>
         /// Devuelve si tiene internet.
         /// </summary>
-        public bool HasInternet()
+        public bool HasInternetConection()
         {
-            return hasInternet = (Application.internetReachability != NetworkReachability.NotReachable);
+            return hasInternetConection = (Application.internetReachability != NetworkReachability.NotReachable);
+        }
+
+        /// <summary>
+        /// Devuelve si la sesión es offline.
+        /// </summary>
+        public bool IsOffline()
+        {
+            return offline;
         }
 
         /// <summary>
@@ -314,7 +325,7 @@ namespace PJML.RushAndRoll
         public void SetUsername(string newUsername)
         {
             username = newUsername;
-            if(hasInternet)
+            if(!offline)
                 PlayerDataManager.Instance.SaveUsername(newUsername);
             else
                 SaveLocalData();
@@ -327,7 +338,7 @@ namespace PJML.RushAndRoll
         /// <param name="callback">Callback que indica si el nombre está disponible.</param>
         public void CheckUsernameAvailability(string name, Action<bool> callback)
         {
-            if(hasInternet)
+            if(!offline)
                 PlayerDataManager.Instance.CheckUsernameAvailability(name, callback);
             else
                 SaveLocalData();
@@ -340,7 +351,7 @@ namespace PJML.RushAndRoll
         public void SetSelectedSkinId(int id)
         {
             selectedSkinId = id;
-            if(hasInternet)
+            if(!offline)
                 PlayerDataManager.Instance.SelectSkin(id);
             else
                 SaveLocalData();
@@ -353,7 +364,7 @@ namespace PJML.RushAndRoll
         public void SpendCoins(int amount)
         {
             coins -= amount;
-            if(hasInternet)
+            if(!offline)
                 PlayerDataManager.Instance.SaveCoins(coins);
             else
                 SaveLocalData();
@@ -367,7 +378,7 @@ namespace PJML.RushAndRoll
         {
             coins += amount;
             totalCollectedCoins += amount;
-            if(hasInternet)
+            if(!offline)
                 PlayerDataManager.Instance.SaveCoins(coins);
             else
                 SaveLocalData();
@@ -387,7 +398,7 @@ namespace PJML.RushAndRoll
             if (!unlockedSkins.Contains(id))
                 unlockedSkins.Add(id);
 
-            if(hasInternet)
+            if(!offline)
                 PlayerDataManager.Instance.BuySkin(id, coins);
             else
                 SaveLocalData();
@@ -433,7 +444,7 @@ namespace PJML.RushAndRoll
         public void SaveTries(int index)
         {
             var level = GetLevelData(index);
-            if(hasInternet)
+            if(!offline)
                 PlayerDataManager.Instance.SaveLevelTries(index, level.tries);
             else
                 SaveLocalData();
@@ -461,7 +472,7 @@ namespace PJML.RushAndRoll
             int nextIndex = index + 1;
             if (nextIndex < levels.Count) levels[nextIndex].unlocked = true;
 
-            if(hasInternet)
+            if(!offline)
                 PlayerDataManager.Instance.SaveLevelData(
                     levelIndex: index,
                     stars: level.stars,
@@ -508,7 +519,7 @@ namespace PJML.RushAndRoll
         /// <param name="playerName">Nombre del jugador.</param>
         private void SaveGlobalBestTime(int levelIndex, float bestTime, string playerName)
         {
-            if(hasInternet)
+            if(!offline)
                 PlayerDataManager.Instance.SaveGlobalBestTime(levelIndex, bestTime, playerName, success =>
                 {
                     if (success)

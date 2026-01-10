@@ -97,7 +97,7 @@ namespace PJML.RushAndRoll
         /// <param name="score">Puntuación.</param>
         public void ReportScore(int levelIndex, long score)
         {
-            if (GameManager.Instance.HasInternet())
+            if (!GameManager.Instance.IsOffline())
             {
                 if (score < 0)
                 {
@@ -132,7 +132,7 @@ namespace PJML.RushAndRoll
         /// </summary>
         public void ShowLeaderboardUI()
         {
-            if (GameManager.Instance.HasInternet())
+            if (!GameManager.Instance.IsOffline())
             {
                 if (GPGSManager.Instance.IsAuthenticated)
                 {

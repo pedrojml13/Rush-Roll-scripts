@@ -65,6 +65,7 @@ namespace PJML.RushAndRoll
         public void OnMenuButton()
         {
             AudioManager.Instance.PlaySFX(buttonClickSound);
+            VibrationManager.Instance.Vibrate();
 
             AudioManager.Instance.SaveVolumes(musicSlider.value, sfxSlider.value);
             SceneManager.LoadScene("Menu");

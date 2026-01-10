@@ -69,7 +69,7 @@ namespace PJML.RushAndRoll
             }
             
 
-            if(GameManager.Instance.HasInternet())
+            if(!GameManager.Instance.IsOffline())
             {
                 playerName.text = GPGSManager.Instance.GetUsername();
                 

@@ -78,7 +78,7 @@ namespace PJML.RushAndRoll
 
             coinNumber.text = GameManager.Instance.GetCoins().ToString();
             
-            if (GameManager.Instance.HasInternet())
+            if (!GameManager.Instance.IsOffline())
             {
                 tryLogInButton.SetActive(false);
                 
@@ -217,7 +217,6 @@ namespace PJML.RushAndRoll
         /// </summary>
         public void OnTryToLogInButton()
         {
-            GameManager.Instance.LogOut();
             SceneManager.LoadScene("Login");
         }
 
@@ -447,11 +446,11 @@ namespace PJML.RushAndRoll
         /// </summary>
         public void OnAchievementsButton()
         {
-#if UNITY_ANDROID
+            #if UNITY_ANDROID
             AudioManager.Instance.PlaySFX(buttonClickSound);
             VibrationManager.Instance.Vibrate();
             AchievementManager.Instance.ShowAchievementsUI();
-#endif
+            #endif
         }
 
         /// <summary>
