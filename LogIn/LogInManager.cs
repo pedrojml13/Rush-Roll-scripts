@@ -419,6 +419,7 @@ namespace PJML.RushAndRoll
                 }
                 else
                 {
+                    HideLoadingScreen();
                     ShowNoAccountPanelPanel();
                 }
             });

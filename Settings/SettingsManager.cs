@@ -15,7 +15,7 @@ namespace PJML.RushAndRoll
         [SerializeField] private Slider sfxSlider;
         [SerializeField] private Toggle vibrationToggle;
 
-        [SerializeField] private GameObject aboutPanel;
+        [SerializeField] private GameObject aboutPanel, giveFeedbackButton;
 
         [Header("Sonidos")]
         [SerializeField] private AudioClip buttonClickSound;
@@ -39,6 +39,11 @@ namespace PJML.RushAndRoll
 
             musicSlider.value = musicVol;
             sfxSlider.value = sfxVol;
+
+            if (GameManager.Instance.IsOffline())
+            {
+                giveFeedbackButton.SetActive(false);
+            }
         }
 
         /// <summary>
@@ -137,6 +142,20 @@ namespace PJML.RushAndRoll
                 LeanTween.alphaCanvas(cg, 1f, 0.4f)
                         .setIgnoreTimeScale(true);
             }
+        }
+
+        /// <summary>
+        /// Reproduce el sonido del botón, vibra y lleva al usuario a la Play Store
+        /// la API de Google Play Review.
+        /// </summary>
+        public void OnGiveFeedbackButton()
+        {
+            AudioManager.Instance.PlaySFX(buttonClickSound);
+            VibrationManager.Instance.Vibrate();
+
+            Application.OpenURL(
+                "market://details?id=" + Application.identifier
+            );
         }
 
         /// <summary>

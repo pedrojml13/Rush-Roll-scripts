@@ -33,7 +33,7 @@ namespace PJML.RushAndRoll
         }
 
         /// <summary>
-        /// Evalúa y reporta logros relacionados con la finalización de un nivel.
+        /// Evalúa y reporta logros relacionados con la finalización de un nivel. Llama a InAppReview en momentos emocionantes para el jugador.
         /// </summary>
         /// <param name="levelIndex">Indice del nivel.</param>
         /// <param name="stars">Cantidad de estrellas obtenidas.</param>
@@ -53,11 +53,26 @@ namespace PJML.RushAndRoll
                     IncrementAchievement(GPGSIds.achievement_halfway_there, 1);
                     IncrementAchievement(GPGSIds.achievement_roll_master, 1);
 
-                    if (levelIndex == 8) ReportProgress(GPGSIds.achievement_beach_explorer);
-                    if (levelIndex == 17) ReportProgress(GPGSIds.achievement_forest_runner);
-                    if (levelIndex == 26) ReportProgress(GPGSIds.achievement_desert_survivor);
-                    if (levelIndex == 35) ReportProgress(GPGSIds.achievement_deep_diver);
-                    if (levelIndex == 44) ReportProgress(GPGSIds.achievement_ice_breaker);
+                    if (levelIndex == 8){
+                        ReportProgress(GPGSIds.achievement_beach_explorer);
+                        InAppReviewManager.Instance.LaunchReview();
+                    }
+                    if (levelIndex == 17){
+                        ReportProgress(GPGSIds.achievement_forest_runner);
+                        InAppReviewManager.Instance.LaunchReview();
+                    }
+                    if (levelIndex == 26){
+                        ReportProgress(GPGSIds.achievement_desert_survivor);
+                        InAppReviewManager.Instance.LaunchReview();
+                    }
+                    if (levelIndex == 35){
+                        ReportProgress(GPGSIds.achievement_deep_diver);
+                        InAppReviewManager.Instance.LaunchReview();
+                    }
+                    if (levelIndex == 44){
+                        ReportProgress(GPGSIds.achievement_ice_breaker);
+                        InAppReviewManager.Instance.LaunchReview();
+                    }
                 }
                     
                 if (levelIndex == 44 && GameManager.Instance.GetAllStars() == 135)

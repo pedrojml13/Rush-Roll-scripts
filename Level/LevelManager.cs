@@ -206,7 +206,7 @@ namespace PJML.RushAndRoll
             int starsCount = CalculateStars(levelTime, levelIndex);
             
             UIManager.Instance.ShowVictoryPanel(starsCount);
-            if(levelIndex == 44 && GameManager.Instance.GetLevels()[44].bestTime == 0f)
+            if(levelIndex == 44)// && GameManager.Instance.GetLevels()[44].bestTime == 0f)
             {
                 UIManager.Instance.ShowEndGamePanel();
                 GameManager.Instance.SaveGameEnded();
@@ -217,8 +217,10 @@ namespace PJML.RushAndRoll
 
             #if UNITY_ANDROID
             LeaderboardManager.Instance.ReportScore(levelIndex, GetElapsedTimeMilis());
-            AchievementManager.Instance.OnLevelCompletedAchievements(levelIndex, starsCount, !GameManager.Instance.GetLevelData(levelIndex + 1).unlocked, coinCount);
+            AchievementManager.Instance.OnLevelCompletedAchievements(levelIndex, starsCount, GameManager.Instance.GetLevels()[levelIndex].bestTime == 0f, coinCount);
             #endif
+
+
 
             GameManager.Instance.SaveLevelData(levelIndex, starsCount, levelTime, coinCount, trophyCollected);
 

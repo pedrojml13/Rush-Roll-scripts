@@ -3,8 +3,6 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections;
 using UnityEngine.UI;
-using Google.Play.Review;
-
 
 
 namespace PJML.RushAndRoll
@@ -464,33 +462,6 @@ namespace PJML.RushAndRoll
             AudioManager.Instance.PlaySFX(buttonClickSound);
             VibrationManager.Instance.Vibrate();
             Application.Quit();
-        }
-
-        /// <summary>
-        /// Reproduce el sonido del botón, vibra y muestra una ventana emergente para dejar una valoración a través de
-        /// la API de Google Play Review.
-        /// </summary>
-        public void OnGiveFeedbackButton()
-        {
-            AudioManager.Instance.PlaySFX(buttonClickSound);
-            VibrationManager.Instance.Vibrate();
-
-            var reviewManager = new ReviewManager();
-            var requestFlow = reviewManager.RequestReviewFlow();
-
-            requestFlow.Completed += (operation) =>
-            {
-                // Si existe un error, la API no muestra el diálogo
-                if (operation.Error == ReviewErrorCode.NoError)
-                {
-                    var playReviewInfo = operation.GetResult();
-                    var launchFlow = reviewManager.LaunchReviewFlow(playReviewInfo);
-                    launchFlow.Completed += (launchOp) =>
-                    {
-                        // El diálogo terminó
-                    };
-                }
-            };
         }
 
         /// <summary>

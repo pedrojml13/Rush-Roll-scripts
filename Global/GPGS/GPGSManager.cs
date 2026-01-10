@@ -16,10 +16,6 @@ namespace PJML.RushAndRoll
         /// Instancia única del AudioManager.
         /// </summary>
         public static GPGSManager Instance { get; private set; }
-
-        /// <summary>
-        /// Indica si el jugador está autenticado en GPGS.
-        /// </summary>
         public bool IsAuthenticated { get; private set; }
 
         
