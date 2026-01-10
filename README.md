@@ -24,7 +24,6 @@ Este repositorio contiene los scripts principales que gestionan la lógica del j
     - Skins desbloqueadas
     - Rankings globales
 
-
 - 🕹 **Integración con Google Play Games Services (GPGS)**
   - Inicio de sesión automático con Google Play
   - Logros (achievements) y leaderboards
@@ -40,6 +39,11 @@ Este repositorio contiene los scripts principales que gestionan la lógica del j
   - Integración de publicidad mediante **Unity Ads** y **Google AdMob** con mediación
   - Gestión de intersticiales, rewarded y banners
   - Soporte de compras dentro de la aplicación para desbloquear contenido o ventajas
+
+- 📝 **Reseñas y Feedback**
+  - Botón en el menú principal para dejar una reseña directamente en Google Play.
+  - Se muestra de forma no intrusiva.
+  - Permite al usuario valorar la aplicación sin salir del juego.
 
 ---
 
