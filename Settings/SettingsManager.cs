@@ -15,7 +15,8 @@ namespace PJML.RushAndRoll
         [SerializeField] private Slider sfxSlider;
         [SerializeField] private Toggle vibrationToggle;
 
-        [SerializeField] private GameObject aboutPanel, giveFeedbackButton;
+        [Header("Paneles y botones")]
+        [SerializeField] private GameObject aboutPanel, giveFeedbackButton, mainPanel;
 
         [Header("Sonidos")]
         [SerializeField] private AudioClip buttonClickSound;
@@ -40,9 +41,22 @@ namespace PJML.RushAndRoll
             musicSlider.value = musicVol;
             sfxSlider.value = sfxVol;
 
+            LeanTween.scale(mainPanel, Vector3.one * 1.03f, 0.2f)
+                .setEaseInOutSine()
+                .setLoopPingPong(1);
+
             if (GameManager.Instance.IsOffline())
             {
                 giveFeedbackButton.SetActive(false);
+            }
+            else
+            {
+                giveFeedbackButton.SetActive(true);
+
+                LeanTween.scale(giveFeedbackButton, Vector3.one * 1.05f, 0.6f)
+                    .setEaseInOutSine()
+                    .setLoopPingPong();
+
             }
         }
 
@@ -152,6 +166,8 @@ namespace PJML.RushAndRoll
         {
             AudioManager.Instance.PlaySFX(buttonClickSound);
             VibrationManager.Instance.Vibrate();
+
+            LeanTween.cancel(giveFeedbackButton);
 
             Application.OpenURL(
                 "market://details?id=" + Application.identifier

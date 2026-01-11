@@ -20,12 +20,17 @@ namespace PJML.RushAndRoll
         [SerializeField] private AudioClip buttonPressed;
         [SerializeField] private AudioClip buttonReleased;
 
+        private int objectsOver;
+
+
         /// <summary>
         /// Se activa cuando un objeto con Collider entra en el área del botón.
         /// </summary>
         /// <param name="other">Objeto que entra en el área.</param>
         private void OnTriggerEnter(Collider other)
         {
+            objectsOver++;
+
             if (pressed) return;
 
             pressed = true;
@@ -42,6 +47,9 @@ namespace PJML.RushAndRoll
         /// <param name="other">Objeto que sale del área.</param>
         private void OnTriggerExit(Collider other)
         {
+            objectsOver--;
+            if(objectsOver > 0) return;
+            
             if (!pressed) return;
 
             pressed = false;

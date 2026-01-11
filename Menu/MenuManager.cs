@@ -28,11 +28,11 @@ namespace PJML.RushAndRoll
         [SerializeField] private TMP_Text sessionPlayedTime, totalTries, totalCoinsCollected, totalCollectedStars;
         [SerializeField] private GameObject tryLogInButton;
         
-        [Header("Botones")]
+        [Header("Botones y paneles")]
         [SerializeField] GameObject rMShopButton;
         [SerializeField] GameObject leaderBoardsButton;
         [SerializeField] GameObject achievementsButton;
-        [SerializeField] GameObject supporterButton, supporterPanel, thanksPanel, supporterImage, gameEndedImage, supporterImage1, gameEndedImage1, extendedPlayerPanel, giveFeedbackButton;
+        [SerializeField] GameObject supporterButton, supporterPanel, thanksPanel, supporterImage, gameEndedImage, supporterImage1, gameEndedImage1, extendedPlayerPanel;
 
         [Header("Elementos de Escena")]
         [SerializeField] private GameObject menuSfere;
@@ -64,6 +64,10 @@ namespace PJML.RushAndRoll
 
             AudioManager.Instance.PlayMusic(menuMusic);
 
+            LeanTween.scale(supporterButton, Vector3.one * 1.05f, 0.6f)
+                    .setEaseInOutSine()
+                    .setLoopPingPong();
+                    
             // Sincronización visual: Espera hasta que el GameManager tenga cargada la skin
             while (GameManager.Instance.GetSelectedBallSkin() == null)
             {
@@ -122,7 +126,6 @@ namespace PJML.RushAndRoll
                 leaderBoardsButton.SetActive(false);
                 achievementsButton.SetActive(false);
                 supporterButton.SetActive(false);
-                giveFeedbackButton.SetActive(false);
                 tryLogInButton.SetActive(true);
 
                 string username = GameManager.Instance.GetUsername();
@@ -143,7 +146,7 @@ namespace PJML.RushAndRoll
                 gameEndedImage.SetActive(true);
                 gameEndedImage1.SetActive(true);
             }
-            
+
             // Reset de rachas y actualización de economía
             GameManager.Instance.ResetWinStreak();
         }

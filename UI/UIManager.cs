@@ -72,7 +72,7 @@ namespace PJML.RushAndRoll
         /// </summary>
         void Start()
         {
-            if (!GameManager.Instance.IsOffline())
+            if (GameManager.Instance.IsOffline())
             {
                 doubleCoinsButton.SetActive(false);
             }

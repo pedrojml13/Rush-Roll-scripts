@@ -4,7 +4,7 @@ using TMPro;
 namespace PJML.RushAndRoll
 {
     /// <summary>
-    /// Gestiona la animación del texto de la tienda de dinero real
+    /// Gestiona la animación de "salto" letra por letra
     /// </summary>
     public class Jumpingtext : MonoBehaviour
     {

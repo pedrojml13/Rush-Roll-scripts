@@ -219,9 +219,8 @@ namespace PJML.RushAndRoll
             }
 
             LeanTween.scale(loadingIcon.gameObject, Vector3.one * 1.1f, 0.5f)
-         .setEaseInOutSine()
-         .setLoopPingPong()
-         .setIgnoreTimeScale(true);
+                .setEaseInOutSine()
+                .setLoopPingPong();
         }
 
         /// <summary>
