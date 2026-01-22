@@ -4,8 +4,9 @@ using System;
 using Firebase.Extensions;
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
-using UnityEngine.SocialPlatforms;
+//using UnityEngine.SocialPlatforms;
 using System.Threading.Tasks;
+using System.Collections;
 
 namespace PJML.RushAndRoll
 {
@@ -22,14 +23,13 @@ namespace PJML.RushAndRoll
         public static AuthManager Instance { get; private set; }
 
         private FirebaseAuth auth;
-        public bool IsAuthenticatedGPGS = false;
 
         /// <summary>
         /// Acceso estático al usuario actual autenticado en Firebase.
         /// Devuelve null si no hay sesión activa.
         /// </summary>
-        public static FirebaseUser currentUser =>
-            FirebaseAuth.DefaultInstance.CurrentUser;
+        public static FirebaseUser currentUser;
+            
 
         /// <summary>
         /// Singleton, asegura que solo exista una instancia
@@ -50,10 +50,13 @@ namespace PJML.RushAndRoll
         /// <summary>
         /// Si tiene internet, se autentica.
         /// </summary>
-        private void Start()
+        private IEnumerator Start()
         {
-            if (Application.internetReachability != NetworkReachability.NotReachable)
-                auth = FirebaseAuth.DefaultInstance;
+            while (!FirebaseInitializer.Instance.IsFirebaseReady)
+                    yield return null;
+            auth = FirebaseAuth.DefaultInstance;
+
+            currentUser = auth.CurrentUser;
         }
 
         /// <summary>

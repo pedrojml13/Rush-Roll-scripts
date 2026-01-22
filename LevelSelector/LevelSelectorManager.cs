@@ -57,7 +57,7 @@ namespace PJML.RushAndRoll
         {
             howToPlayBasePos = howToPlayPanel.GetComponent<RectTransform>().anchoredPosition;
 
-            ShowWorld(0);
+            LoadCurrentPanelIndex();
             GenerateLevelButtons();
         }
 
@@ -122,8 +122,34 @@ namespace PJML.RushAndRoll
         /// </summary>
         public void LoadLevel(int levelIndex)
         {
+            SaveCurrentPanelIndex();
             Time.timeScale = 1f;
             SceneManager.LoadScene(levelIndex + 2);
+        }
+
+        /// <summary>
+        /// Guarda el índice del panel actual en PlayerPrefs.
+        /// </summary>
+        private void SaveCurrentPanelIndex()
+        {
+            PlayerPrefs.SetInt("LastWorldIndex", currentWorld);
+        }
+
+        /// <summary>
+        /// Carga el índice del panel actual desde PlayerPrefs.
+        /// </summary>
+        private void LoadCurrentPanelIndex()
+        {
+            int savedIndex = PlayerPrefs.GetInt("LastWorldIndex", 0);
+            ShowWorld(savedIndex);
+        }
+
+        /// <summary>
+        /// Guarda el índice del panel actual al salir de la aplicación.
+        /// </summary>
+        private void OnApplicationQuit()
+        {
+            SaveCurrentPanelIndex();
         }
 
         /// <summary>
@@ -173,6 +199,8 @@ namespace PJML.RushAndRoll
         /// </summary>
         public void OnMenuButton()
         {
+            SaveCurrentPanelIndex();
+
             AudioManager.Instance.PlaySFX(buttonClickSound);
             VibrationManager.Instance.Vibrate();
             SceneManager.LoadScene("Menu");

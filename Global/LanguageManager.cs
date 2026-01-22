@@ -11,6 +11,9 @@ namespace PJML.RushAndRoll
     /// </summary>
     public class LanguageManager : MonoBehaviour
     {
+        /// <summary>
+        /// Instancia única del LanguageManager.
+        /// </summary>
         public static LanguageManager Instance { get; private set; }
 
         /// <summary>

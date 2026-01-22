@@ -1,16 +1,18 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Firebase.Auth;
+using Firebase.AppCheck;
+using Firebase.Extensions;
 using TMPro;
 using System;
 using System.Collections;
-using Google;
+
+//using Google;
 
 namespace PJML.RushAndRoll
 {
     /// <summary>
-    /// Gestiona el flujo de autenticación del usuario, incluyendo Login, Registro 
-    /// y persistencia de sesión tanto en Android (GPGS) como en PC (Firebase).
+    /// Gestor del proceso de inicio de sesión y registro de usuarios.
     /// </summary>
     public class LoginManager : MonoBehaviour
     {
@@ -20,6 +22,8 @@ namespace PJML.RushAndRoll
         [SerializeField] private GameObject registerPanel;
         [SerializeField] private GameObject loadingPanel;
         [SerializeField] private GameObject loadingIcon;
+        [SerializeField] private GameObject verifyDeviceIntegrityPanel;
+        [SerializeField] private GameObject verifyDeviceIntegrityIcon;
         [SerializeField] private GameObject noAccountPanel;
 
         [Header("Inputs de Login")]
@@ -41,22 +45,27 @@ namespace PJML.RushAndRoll
         /// <summary>
         /// Inicializa la UI, si tiene internet intenta logearse automáticamente y si no se logea offline.
         /// </summary>
-        private void Start()
+        private IEnumerator Start()
         {
-            
             AudioManager.Instance.StopMusic();
 
-            //GameManager.Instance.LogOut();
-            InitializeUI();
-            // Si hay internet nos logeamos, si no vamos al menu.
-            if(GameManager.Instance.HasInternetConection())
-                AttemptAutoLogin();
-            else
+            if(!GameManager.Instance.HasInternetConection())
             {
                 NavigateToMenu(true);
             }
-                
+
+            else
+            {
+                ShowVerifyDeviceIntegrityPanel();
+
+                while (!FirebaseInitializer.Instance.IsFirebaseReady)
+                    yield return null;
+
+                AttemptAutoLogin();
+            }
+
         }
+
 
         /// <summary>
         /// Establece el estado inicial de los paneles de la UI.
@@ -73,32 +82,69 @@ namespace PJML.RushAndRoll
         private void AttemptAutoLogin()
         {
             #if UNITY_ANDROID && !UNITY_EDITOR
-                // Intento de login con Google Play Games Services
-                AuthManager.Instance.LoginWithGPGS((success, error) =>
+            
+            AuthManager.Instance.LoginWithGPGS((success, error) =>
+            {
+                if (success)
                 {
-                    if (success)
-                    {
-                        NavigateToMenu(false);
-                    }
-                    else
-                    {
-                        HideLoadingScreen();
-                        ShowGPGSLoginPanel();
-                    }
-                });
-            #else
-                FirebaseUser user = GameManager.Instance.GetCurrentUser();
-
-                if (user != null)
-                {
-                    NavigateToMenu(false);
+                    HideDeviceIntegrityPanel();
+                    HideLoadingScreen();
+                    NavigateToMenu(false); // sesión Firebase inicializada
                 }
+                    
                 else
                 {
-                    ShowLoginPanel();
+                    HideDeviceIntegrityPanel();
                     HideLoadingScreen();
+                    ShowGPGSLoginPanel();
                 }
+                    
+            });
+
+
+            #else
+            FirebaseUser user = GameManager.Instance.GetCurrentUser();
+
+            if (user != null)
+            {
+                NavigateToMenu(false);
+            }
+            else
+            {
+                ShowLoginPanel();
+                HideLoadingScreen();
+            }
             #endif
+        }
+
+        /// <summary>
+        /// Muestra el panel de "Verificando integridad del dispositivo..." animado con LeanTween
+        /// </summary>
+        public void ShowVerifyDeviceIntegrityPanel()
+        {
+            if (verifyDeviceIntegrityPanel == null) return;
+
+            verifyDeviceIntegrityPanel.SetActive(true);
+            verifyDeviceIntegrityPanel.transform.localScale = Vector3.zero;
+
+            LeanTween.scale(verifyDeviceIntegrityPanel, Vector3.one, 0.5f)
+                .setEaseOutBack();
+
+            LeanTween.rotateZ(verifyDeviceIntegrityIcon.gameObject, 15f, 1f)
+                .setEaseInOutSine()
+                .setLoopPingPong();
+        }
+
+        /// <summary>
+        /// Oculta el panel con un pequeño fade out
+        /// </summary>
+        public void HideDeviceIntegrityPanel()
+        {
+            if(verifyDeviceIntegrityPanel == null) return;
+
+            LeanTween.scale(verifyDeviceIntegrityPanel, Vector3.zero, 0.25f)
+                .setEaseInBack()
+                .setOnComplete(() => verifyDeviceIntegrityPanel.SetActive(false));
         }
 
         /// <summary>
@@ -178,10 +224,11 @@ namespace PJML.RushAndRoll
         }
 
         
-        private void NavigateToMenu(bool isOffline)
+        private void NavigateToMenu(bool offline)
         {
-            loadingPanel.SetActive(true);
-            GameManager.Instance.WaitForSessionReady(isOffline, () =>
+            HideDeviceIntegrityPanel();
+            ShowLoadingScreen();
+            GameManager.Instance.WaitForSessionReady(offline, () =>
             {
                 SceneManager.LoadScene("Menu");
             });

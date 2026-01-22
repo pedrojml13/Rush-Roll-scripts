@@ -67,10 +67,11 @@ namespace PJML.RushAndRoll
         }
 
         /// <summary>
-        /// Inicializa el nivel y reanua el tiempo
+        /// Inicializa el nivel y reanuda el tiempo
         /// </summary>
         private void InitializeLevel()
         {
+
             ResumeTime();
 
             coinCount = 0;
@@ -98,7 +99,12 @@ namespace PJML.RushAndRoll
                 PauseTime();
             }
 
-            if (GameManager.Instance.CanShowInGameAd())
+            if((levelIndex == 9 || levelIndex == 18 || levelIndex == 27 || levelIndex == 36) && GameManager.Instance.GetLevels()[levelIndex].tries == 1)
+            {
+                InAppReviewManager.Instance.LaunchReview();
+            }
+
+            if (GameManager.Instance.CanShowInGameAd() && levelIndex != 0)
             {
                 GameManager.Instance.ResetLastInGameAdTime();
                 GameManager.Instance.ResetTriesSiceLastAd();

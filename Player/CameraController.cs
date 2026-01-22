@@ -25,6 +25,7 @@ namespace PJML.RushAndRoll
         private float horizontalAngle = 120f;
         private float verticalAngle = 20f;
         private PlayerControls controls;
+    
 
         /// <summary>
         /// Inicializa la clase generada por el Input System.
@@ -32,6 +33,7 @@ namespace PJML.RushAndRoll
         void Awake()
         {
             controls = new PlayerControls();
+            rotationSpeed = PlayerPrefs.GetFloat("CameraSensitivity", 0.5f) * 15f;
         }
 
         /// <summary>

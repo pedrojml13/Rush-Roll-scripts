@@ -13,6 +13,9 @@ namespace PJML.RushAndRoll
         [Header("Controles de Audio")]
         [SerializeField] private Slider musicSlider;
         [SerializeField] private Slider sfxSlider;
+        [Header("Controles de sensibilidad")]
+        [SerializeField] private Slider tiltSensibilitySlider;
+        [SerializeField] private Slider cameraSensibilitySlider;
         [SerializeField] private Toggle vibrationToggle;
 
         [Header("Paneles y botones")]
@@ -29,12 +32,17 @@ namespace PJML.RushAndRoll
         /// </summary>
         void Start()
         {
+            AnimateGibveFeedbackButton();
             AudioManager.Instance.PlayMusic(settingsMusic);
 
             LevelPlayManager.Instance.ShowBanner();
 
             float musicVol = PlayerPrefs.GetFloat("MusicVolume", 1f);
             float sfxVol = PlayerPrefs.GetFloat("SFXVolume", 1f);
+
+            tiltSensibilitySlider.value = PlayerPrefs.GetFloat("TiltSensitivity", 0.8f);
+            
+            cameraSensibilitySlider.value = PlayerPrefs.GetFloat("CameraSensitivity", 0.5f);
 
             vibrationToggle.SetIsOnWithoutNotify(VibrationManager.Instance.IsVibrationEnabled());
 
@@ -53,11 +61,20 @@ namespace PJML.RushAndRoll
             {
                 giveFeedbackButton.SetActive(true);
 
-                LeanTween.scale(giveFeedbackButton, Vector3.one * 1.05f, 0.6f)
-                    .setEaseInOutSine()
-                    .setLoopPingPong();
+                AnimateGibveFeedbackButton();
 
             }
+        }
+
+        /// <summary>
+        /// Anima el botón de "Dar Feedback" con LeanTween
+        /// </summary>
+        private void AnimateGibveFeedbackButton()
+        {
+            LeanTween.scale(giveFeedbackButton, Vector3.one * 1.1f, 0.6f)
+                .setEaseInOutSine()
+                .setLoopPingPong();
+
         }
 
         /// <summary>
@@ -86,6 +103,10 @@ namespace PJML.RushAndRoll
             AudioManager.Instance.PlaySFX(buttonClickSound);
             VibrationManager.Instance.Vibrate();
 
+            PlayerPrefs.SetFloat("TiltSensitivity", tiltSensibilitySlider.value);
+            PlayerPrefs.SetFloat("CameraSensitivity", cameraSensibilitySlider.value);
+            PlayerPrefs.Save();
+
             AudioManager.Instance.SaveVolumes(musicSlider.value, sfxSlider.value);
             SceneManager.LoadScene("Menu");
         }
@@ -107,6 +128,10 @@ namespace PJML.RushAndRoll
         private void OnApplicationQuit()
         {
             AudioManager.Instance.SaveVolumes(musicSlider.value, sfxSlider.value);
+
+            PlayerPrefs.SetFloat("TiltSensitivity", tiltSensibilitySlider.value);
+            PlayerPrefs.SetFloat("CameraSensitivity", cameraSensibilitySlider.value);
+            PlayerPrefs.Save();
         }
 
         /// <summary>

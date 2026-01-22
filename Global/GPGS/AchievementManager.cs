@@ -33,7 +33,7 @@ namespace PJML.RushAndRoll
         }
 
         /// <summary>
-        /// Evalúa y reporta logros relacionados con la finalización de un nivel. Llama a InAppReview en momentos emocionantes para el jugador.
+        /// Evalúa y reporta logros relacionados con la finalización de un nivel
         /// </summary>
         /// <param name="levelIndex">Indice del nivel.</param>
         /// <param name="stars">Cantidad de estrellas obtenidas.</param>
@@ -55,23 +55,19 @@ namespace PJML.RushAndRoll
 
                     if (levelIndex == 8){
                         ReportProgress(GPGSIds.achievement_beach_explorer);
-                        InAppReviewManager.Instance.LaunchReview();
+                        
                     }
                     if (levelIndex == 17){
                         ReportProgress(GPGSIds.achievement_forest_runner);
-                        InAppReviewManager.Instance.LaunchReview();
                     }
                     if (levelIndex == 26){
                         ReportProgress(GPGSIds.achievement_desert_survivor);
-                        InAppReviewManager.Instance.LaunchReview();
                     }
                     if (levelIndex == 35){
                         ReportProgress(GPGSIds.achievement_deep_diver);
-                        InAppReviewManager.Instance.LaunchReview();
                     }
                     if (levelIndex == 44){
                         ReportProgress(GPGSIds.achievement_ice_breaker);
-                        InAppReviewManager.Instance.LaunchReview();
                     }
                 }
                     
@@ -151,7 +147,8 @@ namespace PJML.RushAndRoll
                         break;
                 }
 
-                IncrementAchievement(GPGSIds.achievement_monster_mayhem, 1);
+                if (type != EnemyType.None)
+                    IncrementAchievement(GPGSIds.achievement_monster_mayhem, 1);
             }
         }
 
@@ -170,7 +167,7 @@ namespace PJML.RushAndRoll
                 IncrementAchievement(GPGSIds.achievement_style_roller, 1);
 
                 if(purchased == GameManager.Instance.GetTotalSkinsAvailable())
-                    IncrementAchievement(GPGSIds.achievement_fashion_icon, 1);
+                    ReportProgress(GPGSIds.achievement_fashion_icon);
             }
         }
 

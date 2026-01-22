@@ -3,11 +3,18 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using System;
 using TMPro;
+using System.Collections;
 
 namespace PJML.RushAndRoll
 {
+    /// <summary>
+    /// Controlador del comportamiento de la bola del jugador.
+    /// </summary>
     public class BallController : MonoBehaviour
     {
+        /// <summary>
+        /// Instancia única del LevelManager.
+        /// </summary>
         public static BallController Instance { get; private set; }
 
         public float speed = 0.8f;
@@ -28,14 +35,12 @@ namespace PJML.RushAndRoll
         private bool isGrounded = false;
         [SerializeField] private float jumpForce = 5f;
         private float touchStartTime = 0f;
+        private Matrix4x4 calibrationMatrix;
+        private float tiltSensitivity;
 
         /// <summary>
-        /// Inicializa la instancia del singleton de esta clase.
+        /// Singleton, asegura que solo exista una instancia.
         /// </summary>
-        /// <remarks>
-        /// Este método asegura que solo exista una única instancia de este objeto en la escena.
-        /// Si ya existe otra instancia, el objeto duplicado se destruye automáticamente.
-        /// </remarks>
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -49,40 +54,54 @@ namespace PJML.RushAndRoll
 
         }
 
+        /// <summary>
+        /// Inicialización del controlador de la bola.
+        /// </summary>
         void Start()
         {
-            rb = GetComponent<Rigidbody>();
-
-            
+            rb = GetComponent<Rigidbody>();            
             InputSystem.EnableDevice(Accelerometer.current);
+
+            tiltSensitivity = PlayerPrefs.GetFloat("TiltSensitivity", 0.8f);
+
+            StartCoroutine(DelayedCalibration());
         }
 
-        public void RecalibrateTilt()
+        /// <summary>
+        /// Recalibra la inclinación del dispositivo para el control de la bola, espera a que el sensor esté listo.
+        /// </summary>
+        public IEnumerator DelayedCalibration()
         {
-            if (Accelerometer.current != null)
+            // Si sigue dando cero, podemos esperar un frame más
+            while (Accelerometer.current != null && Accelerometer.current.acceleration.ReadValue() == Vector3.zero)
             {
-                Vector3 raw = Accelerometer.current.acceleration.ReadValue();
-
-                Vector3 neutral = new Vector3(raw.x, raw.y, raw.z);
-
-                neutralTilt = neutral;
+                yield return null;
             }
+
+            Vector3 rawAcceleration = Accelerometer.current.acceleration.ReadValue();
+        
+            // Evita calibrar si el sensor devuelve (0,0,0) en el primer frame
+            if (rawAcceleration == Vector3.zero) rawAcceleration = new Vector3(0, -1, 0); 
+
+            Quaternion rotate = Quaternion.FromToRotation(rawAcceleration, new Vector3(0, 0, -1));
+            calibrationMatrix = Matrix4x4.TRS(Vector3.zero, rotate, Vector3.one);
+
         }
 
+        /// <summary>
+        /// Actualización del controlador de la bola dependiendo del dispositivo.
+        /// </summary>
         private void Update()
         {
             if (Accelerometer.current != null)
             {
-                // Móvil: movimiento con giroscopio
                 Vector3 rawTilt = Accelerometer.current.acceleration.ReadValue();
-                Vector3 adjustedTilt = new Vector3(
-                    rawTilt.x - neutralTilt.x,
-                    0f,
-                    rawTilt.z - neutralTilt.z
-                );
 
-                movement = new Vector3(adjustedTilt.x, 0f, -adjustedTilt.z);
-            }
+                // Pasamos el valor crudo por nuestra matriz de calibración para obtener la inclinación corregida
+                Vector3 fixedTilt = calibrationMatrix.MultiplyVector(rawTilt);
+
+                movement = new Vector3(fixedTilt.x, 0f, fixedTilt.y);
+                movement *= tiltSensitivity;}
             else
             {
                 // Editor: movimiento con teclado
@@ -135,11 +154,17 @@ namespace PJML.RushAndRoll
             }
         }
 
+        /// <summary>
+        /// Verifica si la bola está en el suelo.
+        /// </summary>
         private void CheckGrounded()
         {
             isGrounded = Physics.Raycast(transform.position, Vector3.down, 0.6f);
         }
 
+        /// <summary>
+        /// Intenta realizar un salto si la bola está en el suelo.
+        /// </summary>
         private void TryJump()
         {
             if (isGrounded && !GameManager.Instance.IsPaused())
@@ -150,6 +175,9 @@ namespace PJML.RushAndRoll
             }
         }
 
+        /// <summary>
+        /// Actualización física del controlador de la bola.
+        /// </summary>
         private void FixedUpdate()
         {
             wasFalling = rb.linearVelocity.y < -0.5f;
@@ -186,7 +214,10 @@ namespace PJML.RushAndRoll
             }
         }
 
-
+        /// <summary>
+        /// Manejo de colisiones de la bola.
+        /// </summary>
+        /// <param name="collision">Objeto de colisión</param>
         void OnCollisionEnter(Collision collision)
         {
             if (wasFalling && collision.relativeVelocity.y > 2f)

@@ -4,6 +4,7 @@ using Firebase.Auth;
 using Firebase.Extensions;
 using System.Collections.Generic;
 using System;
+using System.Collections;
 
 namespace PJML.RushAndRoll
 {
@@ -41,10 +42,11 @@ namespace PJML.RushAndRoll
         /// <summary>
         /// Si tiene acceso a internet, se conecta a la base de datos
         /// </summary>
-        private void Start()
+        private IEnumerator Start()
         {
-            if((Application.internetReachability != NetworkReachability.NotReachable))
-                db = FirebaseFirestore.DefaultInstance;
+            while (!FirebaseInitializer.Instance.IsFirebaseReady)
+                    yield return null;
+            db = FirebaseFirestore.DefaultInstance;
         }
 
         /// <summary>
@@ -63,6 +65,7 @@ namespace PJML.RushAndRoll
             return db.Collection("users").Document(uid);
         }
 
+
         #region Player Data
 
         /// <summary>
@@ -72,17 +75,25 @@ namespace PJML.RushAndRoll
         /// <param name="callback">Devuelve la información cargada.</param>
         public void LoadFullPlayerData(Action<PlayerProfileData> callback)
         {
-            Debug.Log("[Firestore] Lectura iniciada: PlayerData");
 
             DocumentReference docRef = GetUserDoc();
             if (docRef == null)
             {
+                Debug.LogError("[Firestore] No se pudo obtener la referencia al documento del usuario.");
                 callback?.Invoke(null);
                 return;
             }
 
             docRef.GetSnapshotAsync().ContinueWithOnMainThread(task =>
             {
+                // En caso de error al leer 
+                if (task.IsFaulted || task.IsCanceled)
+                {
+                    Debug.LogError("[Firestore] Error al cargar datos del jugador: " + task.Exception);
+                    callback?.Invoke(null);
+                    return;
+                }
+
                 // Perfil por defecto
                 var profile = new PlayerProfileData
                 {
@@ -118,6 +129,7 @@ namespace PJML.RushAndRoll
 
                     if (snapshot.ContainsField("coins"))
                         profile.coins = (int)(long)snapshot.GetValue<object>("coins");
+                    
 
                     if (snapshot.ContainsField("totalCollectedCoins"))
                         profile.totalCollectedCoins = (int)(long)snapshot.GetValue<object>("totalCollectedCoins");
@@ -150,7 +162,7 @@ namespace PJML.RushAndRoll
                     if (snapshot.ContainsField("gameEnded"))
                         profile.gameEnded = snapshot.GetValue<bool>("gameEnded");
                     if (snapshot.ContainsField("totalPlayedTime"))
-                        profile.coins = (int)(long)snapshot.GetValue<object>("totalPlayedTime");
+                        profile.totalPlayedTime = (int)(long)snapshot.GetValue<object>("totalPlayedTime");
                 }
 
                 callback?.Invoke(profile);

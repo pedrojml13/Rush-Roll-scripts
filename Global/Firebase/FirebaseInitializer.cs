@@ -1,20 +1,14 @@
 using UnityEngine;
 using Firebase;
-using Firebase.Auth;
-using Firebase.Firestore;
 using Firebase.Extensions;
+using Firebase.AppCheck;
 
 namespace PJML.RushAndRoll
 {
-    /// <summary>
-    /// Inicializa Firebase al arrancar el juego y verifica que
-    /// todas las dependencias estén disponibles antes de su uso.
-    /// Implementa el patrón Singleton y persiste entre escenas.
-    /// </summary>
     public class FirebaseInitializer : MonoBehaviour
     {
         /// <summary>
-        /// Instancia única del FirebaseInitializer.
+        /// Instancia única del SessionManager.
         /// </summary>
         public static FirebaseInitializer Instance { get; private set; }
         public bool IsFirebaseReady { get; private set; } = false;
@@ -36,28 +30,32 @@ namespace PJML.RushAndRoll
         }
 
         /// <summary>
-        /// Comprueba y corrige automáticamente las dependencias de Firebase.
-        /// Marca true cuando todas están disponibles.
+        /// Inicializa Firebase y App Check.
         /// </summary>
         private void Start()
         {
-            if (Application.internetReachability != NetworkReachability.NotReachable)
-                FirebaseApp.CheckAndFixDependenciesAsync()
-                    .ContinueWithOnMainThread(task =>
-                    {
-                        var dependencyStatus = task.Result;
-
-                        if (dependencyStatus == DependencyStatus.Available)
-                        {
-                            IsFirebaseReady = true;
-                        }
-                        else
-                        {
-                            Debug.LogError(
-                                "Firebase no está disponible: " + dependencyStatus
-                            );
-                        }
-                    });
+            InitializeFirebaseAndAppCheck();
         }
+
+        /// <summary>
+        /// Inicializa Firebase y App Check.
+        /// </summary>
+        void InitializeFirebaseAndAppCheck()
+        {
+            FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
+            {
+                if (task.Result != DependencyStatus.Available)
+                {
+                    Debug.LogError($"Could not resolve all Firebase dependencies: {task.Result}");
+                    return;
+                }
+                
+                #if UNITY_ANDROID && !UNITY_EDITOR
+                FirebaseAppCheck.SetAppCheckProviderFactory(PlayIntegrityProviderFactory.Instance);             
+                #endif
+                IsFirebaseReady = true;
+            });
+        }
+
     }
 }

@@ -19,11 +19,12 @@ namespace PJML.RushAndRoll
         [SerializeField] private float objectLifetime = 5f;
 
         /// <summary>
-        /// Inicia un ciclo repetitivo que llama a SpawnObject
+        /// Inicia un ciclo repetitivo que llama a SpawnObject.
         /// </summary>
         private void Start()
         {
-            InvokeRepeating(nameof(SpawnObject), 0f, spawnInterval);
+            float randomDelay = Random.Range(0f, spawnInterval);
+            InvokeRepeating(nameof(SpawnObject), randomDelay, spawnInterval);
         }
 
         /// <summary>

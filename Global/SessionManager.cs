@@ -81,6 +81,7 @@ namespace PJML.RushAndRoll
                 {
                     if (profile == null)
                     {
+                        this.offline = true;
                         LoadLocalData();
                         IsReady = true;
                         onComplete?.Invoke();
@@ -111,6 +112,8 @@ namespace PJML.RushAndRoll
                     onComplete?.Invoke();
                     #endif
                 });
+
+                
                 return;
             }
         }

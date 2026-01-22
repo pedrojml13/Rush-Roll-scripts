@@ -7,7 +7,7 @@ namespace PJML.RushAndRoll
     /// Tipos de enemigos disponibles en el juego.
     /// Se utiliza para logros.
     /// </summary>
-    public enum EnemyType { Crab, Spider, Scorpion, Jellyfish, Snowman }
+    public enum EnemyType { Crab, Spider, Scorpion, Jellyfish, Snowman, None }
 
     /// <summary>
     /// Controla el comportamiento base de los enemigos tipo animal:

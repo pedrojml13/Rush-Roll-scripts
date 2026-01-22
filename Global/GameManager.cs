@@ -16,6 +16,9 @@ namespace PJML.RushAndRoll
     /// </summary>
     public class GameManager : MonoBehaviour
     {
+        /// <summary>
+        /// Instancia única del GameManager.
+        /// </summary>
         public static GameManager Instance { get; private set; }
 
         [SerializeField] private List<BallSkin> skins = new();

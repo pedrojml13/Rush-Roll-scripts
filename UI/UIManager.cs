@@ -29,7 +29,6 @@ namespace PJML.RushAndRoll
         [Header("Texts")]
         [SerializeField] private TextMeshProUGUI coinCountText;
         [SerializeField] private TextMeshProUGUI timeText;
-        [SerializeField] private TextMeshProUGUI recalibrateText;
         [SerializeField] private TextMeshProUGUI coinsCollectedText;
         [SerializeField] private TextMeshProUGUI finalTimeText;
         [SerializeField] private TextMeshProUGUI triesText;
@@ -37,6 +36,8 @@ namespace PJML.RushAndRoll
         [SerializeField] private TextMeshProUGUI GameOverText;
         [SerializeField] private TextMeshProUGUI PauseText;
         [SerializeField] private TextMeshProUGUI levelNumberText;
+
+        [SerializeField] private GameObject recalibrateText;
 
         [Header("Icons")]
          [SerializeField] private Image[] starsIcon;
@@ -488,20 +489,20 @@ namespace PJML.RushAndRoll
             AudioManager.Instance.PlaySFX(buttonClickSound);
             if (BallController.Instance == null) return;
 
-            BallController.Instance.RecalibrateTilt();
-            recalibrateText.text = "Recalibrated!";
-            StartCoroutine(ClearTextAfterDelay(1f));
+            StartCoroutine(BallController.Instance.DelayedCalibration());
+            recalibrateText.SetActive(true);
+            StartCoroutine(HideText(1f));
         }
 
         /// <summary>
-        /// Limpia el texto después de un tiempo.
+        /// Oculta el texto de recalibración después de un retraso.
         /// </summary>
-        /// <param name="delay">Tiempo para limpiar el texto.</param>
-        /// <returns>Espera del tiempo pasado.</returns>
-        private IEnumerator ClearTextAfterDelay(float delay)
+        /// <param name="delay">Tiempo de espera antes de ocultar el texto.</param>
+        /// <returns></returns>
+        private IEnumerator HideText(float delay)
         {
-            yield return new WaitForSeconds(delay);
-            recalibrateText.text = "";
+            yield return new WaitForSecondsRealtime(delay);
+            recalibrateText.SetActive(false);
         }
 
         /// <summary>
@@ -551,6 +552,7 @@ namespace PJML.RushAndRoll
                 coinsCollectedText.text = "" + (coinCount * 2);
                 GameManager.Instance.AddCoins(coinCount); // Añade las monedas extra al total
                 doubleCoinsButton.SetActive(false);
+                GameManager.Instance.ResetTriesSiceLastAd();
             });
         }
 
