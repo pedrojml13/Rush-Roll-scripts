@@ -158,11 +158,6 @@ namespace PJML.RushAndRoll
             if (auth.CurrentUser != null)
             {
                 auth.SignOut();
-                Debug.Log("Sesión cerrada correctamente.");
-            }
-            else
-            {
-                Debug.LogWarning("No hay usuario autenticado para cerrar sesión.");
             }
         }
 

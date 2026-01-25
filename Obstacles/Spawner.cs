@@ -24,7 +24,7 @@ namespace PJML.RushAndRoll
         private void Start()
         {
             float randomDelay = Random.Range(0f, spawnInterval);
-            InvokeRepeating(nameof(SpawnObject), randomDelay, spawnInterval);
+            InvokeRepeating(nameof(SpawnObject), randomDelay, spawnInterval + randomDelay);
         }
 
         /// <summary>

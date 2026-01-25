@@ -33,6 +33,9 @@ namespace PJML.RushAndRoll
         [Header("Sonidos")]
         [SerializeField] private AudioClip buttonClickSound;
 
+        [Header("Trofeos")]
+        [SerializeField] private GameObject[] trophyPrefabs;
+
         private int currentWorld = 0;
         private Vector2 howToPlayBasePos;
 
@@ -85,6 +88,7 @@ namespace PJML.RushAndRoll
         /// <param name="worldIndex">Indice del mundo</param>
         public void ShowWorld(int worldIndex)
         {
+            trophyPrefabs[currentWorld].SetActive(false);
             currentWorld = Mathf.Clamp(worldIndex, 0, worldPanels.Length - 1);
 
             for (int i = 0; i < worldPanels.Length; i++)
@@ -98,6 +102,11 @@ namespace PJML.RushAndRoll
 
             AnimatePanel(worldPanels[currentWorld]);
             AudioManager.Instance.PlayMusic(musicClips[currentWorld]);
+            if (GameManager.Instance.GetLevels()[currentWorld * 9 + 4].trophyCollected)
+            trophyPrefabs[currentWorld].SetActive(true);
+            
+            
+                
         }
 
         /// <summary>

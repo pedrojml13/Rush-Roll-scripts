@@ -48,6 +48,7 @@ namespace PJML.RushAndRoll
 
         [Header("Sounds")]
         [SerializeField] private AudioClip buttonClickSound;
+        [SerializeField] private AudioClip doubleCoinsSound;
 
         [SerializeField] private GameObject doubleCoinsButton;
         [SerializeField] private GameObject star1, star2, star3;
@@ -551,6 +552,7 @@ namespace PJML.RushAndRoll
                 int coinCount = int.Parse(coinsCollectedText.text);
                 coinsCollectedText.text = "" + (coinCount * 2);
                 GameManager.Instance.AddCoins(coinCount); // Añade las monedas extra al total
+                AudioManager.Instance.PlaySFX(doubleCoinsSound);
                 doubleCoinsButton.SetActive(false);
                 GameManager.Instance.ResetTriesSiceLastAd();
             });

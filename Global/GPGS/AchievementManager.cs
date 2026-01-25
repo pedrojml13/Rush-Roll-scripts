@@ -161,7 +161,7 @@ namespace PJML.RushAndRoll
             {
                 int purchased = GameManager.Instance.GetTotalPurchasedSkins();
                 
-                if(purchased == 1)
+                if(purchased == 2)
                     ReportProgress(GPGSIds.achievement_window_shopper);
 
                 IncrementAchievement(GPGSIds.achievement_style_roller, 1);

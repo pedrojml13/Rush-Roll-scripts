@@ -355,7 +355,11 @@ namespace PJML.RushAndRoll
                         .setIgnoreTimeScale(true);
             }
 
-            LevelPlayManager.Instance.ShowBanner();
+            if(!GameManager.Instance.IsSupporter())
+                {
+                    // Muestra el banner de publicidad en el menú si no es Supporter
+                    LevelPlayManager.Instance.ShowBanner();
+                }
         }
 
         /// <summary>
@@ -426,7 +430,11 @@ namespace PJML.RushAndRoll
                         .setIgnoreTimeScale(true);
             }
 
-            LevelPlayManager.Instance.ShowBanner();
+            if(!GameManager.Instance.IsSupporter())
+                {
+                    // Muestra el banner de publicidad en el menú si no es Supporter
+                    LevelPlayManager.Instance.ShowBanner();
+                }
         }
 
 

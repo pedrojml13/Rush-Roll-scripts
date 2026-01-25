@@ -78,9 +78,7 @@ namespace PJML.RushAndRoll
         /// Muestra la ventana de reseña sobre la pantalla de victoria.
         /// </summary>
         private IEnumerator ShowReview()
-        {
-            yield return new WaitForSecondsRealtime(2f);
-            
+        {    
             var launchFlowOperation = _reviewManager.LaunchReviewFlow(_playReviewInfo);
             yield return launchFlowOperation;
             

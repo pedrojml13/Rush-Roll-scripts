@@ -99,11 +99,6 @@ namespace PJML.RushAndRoll
                 PauseTime();
             }
 
-            if((levelIndex == 9 || levelIndex == 18 || levelIndex == 27 || levelIndex == 36) && GameManager.Instance.GetLevels()[levelIndex].tries == 1)
-            {
-                InAppReviewManager.Instance.LaunchReview();
-            }
-
             if (GameManager.Instance.CanShowInGameAd() && levelIndex != 0)
             {
                 GameManager.Instance.ResetLastInGameAdTime();
@@ -209,6 +204,8 @@ namespace PJML.RushAndRoll
 
             float levelTime = GetElapsedTime();
 
+            PauseTime();
+
             int starsCount = CalculateStars(levelTime, levelIndex);
             
             UIManager.Instance.ShowVictoryPanel(starsCount);
@@ -227,11 +224,13 @@ namespace PJML.RushAndRoll
             #endif
 
 
+            if((levelIndex == 9 || levelIndex == 18 || levelIndex == 27 || levelIndex == 36) && GameManager.Instance.GetLevels()[levelIndex].bestTime == 0f)
+            {
+                InAppReviewManager.Instance.LaunchReview();
+            }
+
 
             GameManager.Instance.SaveLevelData(levelIndex, starsCount, levelTime, coinCount, trophyCollected);
-
-            
-            PauseTime();
         }
 
         /// <summary>

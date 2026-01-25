@@ -93,6 +93,7 @@ namespace PJML.RushAndRoll
                     totalCollectedCoins = profile.totalCollectedCoins;
 
                     isSupporter = profile.isSupporter;
+                    gameEnded = profile.gameEnded;
 
                     selectedSkinId = profile.currentSkinId;
                     unlockedSkins = profile.unlockedSkinIds;
@@ -139,6 +140,7 @@ namespace PJML.RushAndRoll
         /// </summary>
         public void SaveIsSupporter()
         {
+            isSupporter = true;
             PlayerDataManager.Instance.SaveIsSupporter();
         }
 
@@ -156,6 +158,7 @@ namespace PJML.RushAndRoll
         /// </summary>
         public void SaveGameEnded()
         {
+            gameEnded = true;
             PlayerDataManager.Instance.SaveGameEnded();
         }
 
@@ -368,7 +371,7 @@ namespace PJML.RushAndRoll
         {
             coins -= amount;
             if(!offline)
-                PlayerDataManager.Instance.SaveCoins(coins);
+                PlayerDataManager.Instance.SaveCoins(coins, totalCollectedCoins);
             else
                 SaveLocalData();
         }
@@ -382,7 +385,7 @@ namespace PJML.RushAndRoll
             coins += amount;
             totalCollectedCoins += amount;
             if(!offline)
-                PlayerDataManager.Instance.SaveCoins(coins);
+                PlayerDataManager.Instance.SaveCoins(coins, totalCollectedCoins);
             else
                 SaveLocalData();
         }

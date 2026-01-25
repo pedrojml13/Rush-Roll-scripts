@@ -65,7 +65,11 @@ namespace PJML.RushAndRoll
             }
             else
             {
-                LevelPlayManager.Instance.ShowBanner();
+                if(!GameManager.Instance.IsSupporter())
+                {
+                    // Muestra el banner de publicidad si no es Supporter
+                    LevelPlayManager.Instance.ShowBanner();
+                }
             }
             
 

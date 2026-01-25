@@ -49,7 +49,7 @@ namespace PJML.RushAndRoll
                 return;
             }
 
-            ballRenderer.material = GameManager.Instance.GetSelectedBallSkin().material;
+            //ballRenderer.material = GameManager.Instance.GetSelectedBallSkin().material;
             Instance = this;
 
         }

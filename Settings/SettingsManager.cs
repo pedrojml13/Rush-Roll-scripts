@@ -35,8 +35,6 @@ namespace PJML.RushAndRoll
             AnimateGibveFeedbackButton();
             AudioManager.Instance.PlayMusic(settingsMusic);
 
-            LevelPlayManager.Instance.ShowBanner();
-
             float musicVol = PlayerPrefs.GetFloat("MusicVolume", 1f);
             float sfxVol = PlayerPrefs.GetFloat("SFXVolume", 1f);
 

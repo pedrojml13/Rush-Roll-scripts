@@ -42,17 +42,17 @@ namespace PJML.RushAndRoll
         /// </summary>
         void InitializeFirebaseAndAppCheck()
         {
+
+            FirebaseAppCheck.SetAppCheckProviderFactory(PlayIntegrityProviderFactory.Instance);             
+
             FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
             {
                 if (task.Result != DependencyStatus.Available)
                 {
                     Debug.LogError($"Could not resolve all Firebase dependencies: {task.Result}");
                     return;
-                }
+                }     
                 
-                #if UNITY_ANDROID && !UNITY_EDITOR
-                FirebaseAppCheck.SetAppCheckProviderFactory(PlayIntegrityProviderFactory.Instance);             
-                #endif
                 IsFirebaseReady = true;
             });
         }

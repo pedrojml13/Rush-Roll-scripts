@@ -10,19 +10,18 @@ namespace PJML.RushAndRoll
     {
         [Header("Configuración de Seguimiento")]
         [Tooltip("La bola o jugador al que la cámara debe orbitar.")]
-        public Transform target;
+        [SerializeField] Transform target;
         
         [Tooltip("Distancia fija entre la cámara y la bola.")]
-        public float distance = 7f;
+        [SerializeField] float distance = 7f;
         
         [Tooltip("Ajuste vertical del punto de mira (LookAt) para no mirar a los 'pies' de la bola.")]
-        public float heightOffset = 0.5f;
+        [SerializeField] float heightOffset = 0.5f;
 
         [Header("Configuración de Rotación")]
         [Tooltip("Sensibilidad del movimiento de la cámara.")]
-        public float rotationSpeed = 10f;
-
-        private float horizontalAngle = 120f;
+        [SerializeField] float rotationSpeed = 10f;
+        private float horizontalAngle;
         private float verticalAngle = 20f;
         private PlayerControls controls;
     
@@ -50,6 +49,11 @@ namespace PJML.RushAndRoll
         void OnDisable()
         {
             controls.Disable();
+        }
+        
+        void Start()
+        {
+            horizontalAngle = transform.eulerAngles.y;
         }
 
         /// <summary>

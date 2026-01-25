@@ -58,7 +58,6 @@ namespace PJML.RushAndRoll
             string uid = AuthManager.Instance.GetUserId();
             if (string.IsNullOrEmpty(uid))
             {
-                Debug.LogWarning("No hay usuario autenticado.");
                 return null;
             }
 
@@ -156,6 +155,7 @@ namespace PJML.RushAndRoll
                                 if (val.ContainsKey("stars")) level.stars = (int)(long)val["stars"];
                                 if (val.ContainsKey("bestTime")) level.bestTime = (float)(double)val["bestTime"];
                                 if (val.ContainsKey("tries")) level.tries = (int)(long)val["tries"];
+                                if (val.ContainsKey("trophyCollected")) level.trophyCollected = (bool)val["trophyCollected"];
                             }
                         }
                     }
@@ -181,7 +181,6 @@ namespace PJML.RushAndRoll
         /// <param name="callback">Devuelve si está disponible.</param>
         public void CheckUsernameAvailability(string username, Action<bool> callback)
         {
-            Debug.Log("[Firestore] Lectura iniciada: CheckUsernameAvailability");
 
             if (string.IsNullOrEmpty(username))
             {
@@ -202,7 +201,6 @@ namespace PJML.RushAndRoll
         /// <param name="username">Nombre a guardar.</param>
         public void SaveUsername(string username)
         {
-            Debug.Log("[Firestore] Escritura iniciada: SaveUsername");
 
             var uid = AuthManager.Instance.GetUserId();
             var userDoc = GetUserDoc();
@@ -270,15 +268,16 @@ namespace PJML.RushAndRoll
         /// <summary>
         /// Guarda en Firestone el número de monedas del jugador.
         /// </summary>
-        public void SaveCoins(int newCoinAmount)
+        public void SaveCoins(int newCoinAmount, int newTotalCollectedCoins)
         {
             DocumentReference docRef = GetUserDoc();
             if (docRef == null) return;
 
-            docRef.SetAsync(
-                new Dictionary<string, object> { { "coins", newCoinAmount } },
-                SetOptions.MergeAll
-            );
+            docRef.SetAsync(new Dictionary<string, object>
+            {
+                { "coins", newCoinAmount },
+                { "totalCollectedCoins", newTotalCollectedCoins }
+            }, SetOptions.MergeAll);
         }
 
         #region Balls / Skins
