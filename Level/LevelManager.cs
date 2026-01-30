@@ -72,6 +72,12 @@ namespace PJML.RushAndRoll
         private void InitializeLevel()
         {
 
+            // Mostrar review en niveles específicos si es el primer intento
+            if((levelIndex == 9 || levelIndex == 18 || levelIndex == 27 || levelIndex == 36) && GameManager.Instance.GetLevels()[levelIndex].tries == 1)
+            {
+                InAppReviewManager.Instance.LaunchReview();
+            }
+
             ResumeTime();
 
             coinCount = 0;
@@ -222,12 +228,6 @@ namespace PJML.RushAndRoll
             LeaderboardManager.Instance.ReportScore(levelIndex, GetElapsedTimeMilis());
             AchievementManager.Instance.OnLevelCompletedAchievements(levelIndex, starsCount, GameManager.Instance.GetLevels()[levelIndex].bestTime == 0f, coinCount);
             #endif
-
-
-            if((levelIndex == 9 || levelIndex == 18 || levelIndex == 27 || levelIndex == 36) && GameManager.Instance.GetLevels()[levelIndex].bestTime == 0f)
-            {
-                InAppReviewManager.Instance.LaunchReview();
-            }
 
 
             GameManager.Instance.SaveLevelData(levelIndex, starsCount, levelTime, coinCount, trophyCollected);

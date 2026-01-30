@@ -86,7 +86,7 @@ namespace PJML.RushAndRoll
         /// <param name="tries">Número de intentos.</param>
         public void UpdateTriesText(int tries)
         {
-            triesText.text = "Try: " + tries;
+            triesText.text = "" + tries;
         }
 
         /// <summary>
