@@ -73,9 +73,17 @@ namespace PJML.RushAndRoll
         {
 
             // Mostrar review en niveles específicos si es el primer intento
-            if((levelIndex == 9 || levelIndex == 18 || levelIndex == 27 || levelIndex == 36) && GameManager.Instance.GetLevels()[levelIndex].tries == 1)
+            if((levelIndex == 10 || levelIndex == 19 || levelIndex == 28 || levelIndex == 37) && GameManager.Instance.GetLevels()[levelIndex].tries == 1)
             {
                 InAppReviewManager.Instance.LaunchReview();
+            }
+
+            // Mostrar anuncio intersticial si es posible, si no es el nivel 0 y si no se muestra el In App Review
+            else if (GameManager.Instance.CanShowInGameAd() && levelIndex != 0)
+            {
+                GameManager.Instance.ResetLastInGameAdTime();
+                GameManager.Instance.ResetTriesSiceLastAd();
+                LevelPlayManager.Instance.ShowInterstitial();
             }
 
             ResumeTime();
@@ -105,12 +113,8 @@ namespace PJML.RushAndRoll
                 PauseTime();
             }
 
-            if (GameManager.Instance.CanShowInGameAd() && levelIndex != 0)
-            {
-                GameManager.Instance.ResetLastInGameAdTime();
-                GameManager.Instance.ResetTriesSiceLastAd();
-                LevelPlayManager.Instance.ShowInterstitial();
-            }
+            
+
         }
 
         /// <summary>
