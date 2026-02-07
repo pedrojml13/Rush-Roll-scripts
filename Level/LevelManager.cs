@@ -72,14 +72,16 @@ namespace PJML.RushAndRoll
         private void InitializeLevel()
         {
 
-            // Mostrar review en niveles específicos si es el primer intento
-            if((levelIndex == 10 || levelIndex == 19 || levelIndex == 28 || levelIndex == 37) && GameManager.Instance.GetLevels()[levelIndex].tries == 1)
-            {
-                InAppReviewManager.Instance.LaunchReview();
-            }
+            coinCount = 0;
+            levelEnded = false;
+            counting = false;
 
+            levelIndex = SceneManager.GetActiveScene().buildIndex - 2;
+            GameManager.Instance.AddTryToLevel(levelIndex);
+
+            
             // Mostrar anuncio intersticial si es posible, si no es el nivel 0 y si no se muestra el In App Review
-            else if (GameManager.Instance.CanShowInGameAd() && levelIndex != 0)
+            if (GameManager.Instance.CanShowInGameAd() && levelIndex != 0)
             {
                 GameManager.Instance.ResetLastInGameAdTime();
                 GameManager.Instance.ResetTriesSiceLastAd();
@@ -87,13 +89,6 @@ namespace PJML.RushAndRoll
             }
 
             ResumeTime();
-
-            coinCount = 0;
-            levelEnded = false;
-            counting = false;
-
-            levelIndex = SceneManager.GetActiveScene().buildIndex - 2;
-            GameManager.Instance.AddTryToLevel(levelIndex);
 
             // Inicializa UI
             UIManager.Instance.ShowUIPanel();
@@ -216,14 +211,14 @@ namespace PJML.RushAndRoll
 
             PauseTime();
 
-            int starsCount = CalculateStars(levelTime, levelIndex);
-            
-            UIManager.Instance.ShowVictoryPanel(starsCount);
-            if(levelIndex == 44)// && GameManager.Instance.GetLevels()[44].bestTime == 0f)
+            // Mostrar review en niveles específicos
+            if((levelIndex == 10 || levelIndex == 19 || levelIndex == 28 || levelIndex == 37) && GameManager.Instance.GetLevels()[levelIndex].bestTime == 0f)
             {
-                UIManager.Instance.ShowEndGamePanel();
-                GameManager.Instance.SaveGameEnded();
+                InAppReviewManager.Instance.LaunchReview();
             }
+
+            int starsCount = CalculateStars(levelTime, levelIndex);
+            UIManager.Instance.ShowVictoryPanel(starsCount);
 
             GameManager.Instance.IncrementWinStreak();
             GameManager.Instance.ResetCurrentLevelTries();
@@ -233,6 +228,11 @@ namespace PJML.RushAndRoll
             AchievementManager.Instance.OnLevelCompletedAchievements(levelIndex, starsCount, GameManager.Instance.GetLevels()[levelIndex].bestTime == 0f, coinCount);
             #endif
 
+            if(levelIndex == 44)// && GameManager.Instance.GetLevels()[44].bestTime == 0f)
+            {
+                UIManager.Instance.ShowEndGamePanel();
+                GameManager.Instance.SaveGameEnded();
+            }
 
             GameManager.Instance.SaveLevelData(levelIndex, starsCount, levelTime, coinCount, trophyCollected);
         }
